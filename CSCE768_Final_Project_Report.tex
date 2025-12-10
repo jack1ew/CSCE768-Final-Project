@@ -68,12 +68,12 @@ This work makes three primary contributions:
 Win probability models have a long history in sports analytics. Lock and Nettleton~\cite{lock2014} developed in-game probability models for basketball using logistic regression, demonstrating that estimates improve as games progress. However, traditional approaches assume independent possessions and minimal carryover effects. CS:GO violates these assumptions due to its economic momentum system.
 
 \subsection{Esports Prediction}
-Recent work has addressed esports prediction challenges. Junior and Campelo~\cite{moreira2023} predicted League of Legends outcomes using real-time match statistics, achieving 81.6\% accuracy with LightGBM in mid-game prediction. Hodge et al.~\cite{hodge2019} developed win probability graphs for Dota 2. However, these studies focus on match-level prediction rather than round-by-round evolution.
+Recent work has addressed esports prediction challenges. Junior and Campelo~\cite{junior2023} predicted League of Legends outcomes using real-time match statistics, achieving 81.6\% accuracy with LightGBM in mid-game prediction. Hodge et al.~\cite{hodge2019} developed win probability graphs for Dota 2. However, these studies focus on match-level prediction rather than round-by-round evolution.
 
-For CS:GO specifically, Silva et al.~\cite{silva2017} predicted match winners using team statistics, while Agarwala and Pearce~\cite{agarwala2014} analyzed optimal buying strategies. Our work differs by focusing on within-match dynamics and quantifying how prediction confidence evolves.
+For CS:GO specifically, Xenopoulos et al.~\cite{xenopoulos2021} developed win probability models using XGBoost with features like team scores and equipment values. Our work differs by focusing on within-match dynamics and quantifying how prediction confidence evolves.
 
 \subsection{Sequential Models}
-Transformer architectures~\cite{vaswani2017}, originally developed for NLP, have shown strong performance on sequential prediction tasks including NBA play-by-play~\cite{fernandez2021} and soccer event modeling~\cite{decroos2019}. We extend this work to CS:GO, demonstrating that Transformers effectively model round-to-round dependencies including economic carryover effects.
+Transformer architectures~\cite{vaswani2017}, originally developed for NLP, have shown strong performance on sequential prediction tasks including soccer possession evaluation~\cite{fernandez2021} and soccer event modeling~\cite{decroos2019}. We extend this work to CS:GO, demonstrating that Transformers effectively model round-to-round dependencies including economic carryover effects.
 
 \textbf{Research Gap:} No prior study has (1) analyzed how prediction accuracy evolves round-by-round across entire matches, (2) quantified economic momentum's impact on comeback potential, or (3) applied Transformer models to round-by-round CS:GO prediction.
 
@@ -100,7 +100,7 @@ Combined & 1,697,114 & 33,268 & 51.0 \\
 
 \subsection{Dataset Descriptions}
 
-\textbf{ESTA Dataset}~\cite{xenopoulos2020} provides the highest-fidelity professional match telemetry available. Originally containing 1,729 matches, we filtered to 1,558 matches played before August 2023 to exclude CS2 (Counter-Strike 2) matches which use different game mechanics. ESTA includes comprehensive player-level statistics: individual kills, deaths, assists, damage dealt, headshot percentages, equipment purchases, utility usage (grenades, flashbangs), and even spatial positioning data (player coordinates). This rich feature set enables detailed modeling of in-game performance beyond aggregate team statistics.
+\textbf{ESTA Dataset}~\cite{xenopoulos2022} provides the highest-fidelity professional match telemetry available. Originally containing 1,729 matches, we filtered to 1,558 matches played before August 2023 to exclude CS2 (Counter-Strike 2) matches which use different game mechanics. ESTA includes comprehensive player-level statistics: individual kills, deaths, assists, damage dealt, headshot percentages, equipment purchases, utility usage (grenades, flashbangs), and even spatial positioning data (player coordinates). This rich feature set enables detailed modeling of in-game performance beyond aggregate team statistics.
 
 \textbf{Kaggle Dataset} comprises 31,710 professional matches focused on economic features. While lacking individual player telemetry, it provides detailed economic tracking: starting equipment value (total gear worth at round start), ending equipment value (surviving gear), equipment spending per round, and money remaining. The dataset's larger scale (20× more matches than ESTA) provides statistical power for detecting subtle patterns and ensures findings generalize beyond small samples.
 
@@ -439,25 +439,21 @@ D.~Lock and D.~Nettleton.
 \newblock Using random forests to estimate win probability before each play of an nfl game.
 \newblock {\em Journal of Quantitative Analysis in Sports}, 10(2):197--205, 2014.
 
-\bibitem{moreira2023}
+\bibitem{junior2023}
 J.~B.~S. Junior and C.~E.~C. Campelo.
 \newblock League of legends: Real-time result prediction.
 \newblock arXiv:2309.02449, 2023.
 
 \bibitem{hodge2019}
-V.~J. Hodge et al.
+V.~J. Hodge, S.~Devlin, N.~Sephton, F.~Block, P.~I.~Cowling, and A.~Drachen.
 \newblock Win prediction in multiplayer esports: Live professional match prediction.
-\newblock {\em IEEE Transactions on Games}, 2019.
+\newblock {\em IEEE Transactions on Games}, 13(4):368--379, 2021.
 
-\bibitem{silva2017}
-J.~P. Silva, T.~A. Sousa, and D.~S. Santos.
-\newblock Predicting the outcome of professional cs:go matches.
-\newblock In {\em International Conference on Entertainment Computing}, pages 126--137, 2017.
+\bibitem{xenopoulos2021}
+P.~Xenopoulos, B.~G.~Coelho, and C.~T.~Silva.
+\newblock Optimal team economic decisions in Counter-Strike.
+\newblock arXiv:2109.12990, 2021.
 
-\bibitem{agarwala2014}
-A.~Agarwala and M.~Pearce.
-\newblock Learning dota 2 team compositions.
-\newblock Technical report, Stanford University, 2014.
 
 \bibitem{vaswani2017}
 A.~Vaswani et al.
@@ -466,7 +462,7 @@ A.~Vaswani et al.
 
 \bibitem{fernandez2021}
 J.~Fern{\'a}ndez, L.~Bornn, and D.~Cervone.
-\newblock A framework for the fine-grained evaluation of soccer possessions.
+\newblock A framework for the fine-grained evaluation of the instantaneous expected value of soccer possessions.
 \newblock {\em Machine Learning}, 110(6):1389--1427, 2021.
 
 \bibitem{decroos2019}
@@ -474,10 +470,10 @@ T.~Decroos et al.
 \newblock Actions speak louder than goals: Valuing player actions in soccer.
 \newblock In {\em Proceedings of the 25th ACM SIGKDD International Conference}, pages 1851--1861, 2019.
 
-\bibitem{xenopoulos2020}
-P.~Xenopoulos, H.~Doraiswamy, and C.~Silva.
-\newblock Esta: A platform for esports game log and replay analysis.
-\newblock {\em arXiv preprint arXiv:2011.01301}, 2020.
+\bibitem{xenopoulos2022}
+P.~Xenopoulos and C.~T.~Silva.
+\newblock ESTA: An esports trajectory and action dataset.
+\newblock arXiv:2209.09861, 2022.
 
 \end{thebibliography}
 

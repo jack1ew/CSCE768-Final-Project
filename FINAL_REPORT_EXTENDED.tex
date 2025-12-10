@@ -153,9 +153,8 @@ However, these studies focus on match-level prediction (who will win) rather tha
 
 Prior CS:GO research has examined:
 \begin{itemize}
-    \item \textbf{Economic modeling:} Agarwala and Pearce~\cite{agarwala2014} analyzed optimal buying strategies
     \item \textbf{Player performance:} Xenopoulos et al.~\cite{xenopoulos2020} created comprehensive gameplay datasets (ESTA)
-    \item \textbf{Match outcome prediction:} Silva et al.~\cite{silva2017} predicted match winners using team statistics
+    \item \textbf{Match outcome prediction:} Xenopoulos et al.~\cite{xenopoulos2021} developed win probability models using XGBoost
 \end{itemize}
 
 Our work differs by focusing on within-match dynamics and economic momentum, rather than pre-match predictions or isolated economic decisions.
@@ -175,9 +174,9 @@ This creates a complex strategic landscape where teams must balance short-term r
 
 Transformer architectures~\cite{vaswani2017}, originally developed for natural language processing, have shown strong performance on sequential prediction tasks. Recent applications to sports include:
 \begin{itemize}
-    \item NBA play-by-play prediction~\cite{fernandez2021}
+    \item Soccer possession evaluation~\cite{fernandez2021}
     \item Soccer event sequence modeling~\cite{decroos2019}
-    \item Cricket outcome prediction~\cite{pathak2020}
+    \item Cricket outcome prediction~\cite{pathak2016}
 \end{itemize}
 
 We extend this work to CS:GO, demonstrating that Transformers can effectively model the sequential dependencies between rounds, including economic carryover effects.
@@ -723,6 +722,8 @@ Understanding how model confidence evolves throughout matches provides insight i
 \label{fig:multi_run_accuracy}
 \end{figure}
 
+\clearpage
+
 \section{Discussion}
 \label{sec:discussion}
 
@@ -837,6 +838,8 @@ Based on comprehensive empirical analysis:
     \item \textbf{Dataset-Specific Architecture:} If deploying on only ESTA, the CNN-Transformer's +0.8pp advantage may justify the instability cost
 \end{enumerate}
 
+\clearpage
+
 \section{Conclusion}
 \label{sec:conclusion}
 
@@ -863,6 +866,8 @@ This project successfully developed and evaluated round-by-round win probability
     \item Causal analysis of economic decision impacts
 \end{itemize}
 
+\clearpage
+
 \bibliographystyle{plain}
 \begin{thebibliography}{99}
 
@@ -876,16 +881,14 @@ Stern, H. S. (1994). A Brownian motion model for the progress of sports scores. 
 Junior, J. B. S., \& Campelo, C. E. C. (2023). League of Legends: Real-time result prediction. arXiv:2309.02449.
 
 \bibitem{hodge2019}
-Hodge, V. J., Devlin, S., Sephton, N., Block, F., Drachen, A., \& Cowling, P. I. (2019). Win prediction in multiplayer esports: Live professional match prediction. \textit{IEEE Transactions on Games}.
+Hodge, V. J., Devlin, S., Sephton, N., Block, F., Cowling, P. I., \& Drachen, A. (2021). Win prediction in multiplayer esports: Live professional match prediction. \textit{IEEE Transactions on Games}, 13(4), 368-379.
 
-\bibitem{agarwala2014}
-Agarwala, A., \& Pearce, M. (2014). Learning dota 2 team compositions. Technical Report, Stanford University.
 
 \bibitem{xenopoulos2020}
-Xenopoulos, P., Doraiswamy, H., \& Silva, C. (2020). ESTA: A Platform for Esports Game Log and Replay Analysis. \textit{arXiv preprint arXiv:2011.01301}.
+Xenopoulos, P., \& Silva, C. T. (2022). ESTA: An Esports Trajectory and Action Dataset. arXiv:2209.09861.
 
-\bibitem{silva2017}
-Silva, J. P., Sousa, T. A., \& Santos, D. S. (2017). Predicting the outcome of professional CS:GO matches. In \textit{International Conference on Entertainment Computing} (pp. 126-137).
+\bibitem{xenopoulos2021}
+Xenopoulos, P., Coelho, B. G., \& Silva, C. T. (2021). Optimal team economic decisions in Counter-Strike. arXiv:2109.12990.
 
 \bibitem{vaswani2017}
 Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., ... \& Polosukhin, I. (2017). Attention is all you need. In \textit{Advances in neural information processing systems} (pp. 5998-6008).
@@ -896,8 +899,8 @@ Fernández, J., Bornn, L., \& Cervone, D. (2021). A framework for the fine-grain
 \bibitem{decroos2019}
 Decroos, T., Bransen, L., Van Haaren, J., \& Davis, J. (2019). Actions speak louder than goals: Valuing player actions in soccer. In \textit{Proceedings of the 25th ACM SIGKDD International Conference} (pp. 1851-1861).
 
-\bibitem{pathak2020}
-Pathak, N., \& Wadhwa, H. (2020). Applications of modern classification techniques to predict the outcome of ODI Cricket. \textit{Procedia Computer Science}, 87, 55-60.
+\bibitem{pathak2016}
+Pathak, N., \& Wadhwa, H. (2016). Applications of modern classification techniques to predict the outcome of ODI Cricket. \textit{Procedia Computer Science}, 87, 55-60.
 
 \bibitem{he2015}
 He, K., Zhang, X., Ren, S., \& Sun, J. (2015). Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In \textit{Proceedings of the IEEE international conference on computer vision} (pp. 1026-1034).
