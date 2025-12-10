@@ -30,11 +30,11 @@ How does prediction accuracy for CS:GO match outcomes evolve from round 1 to rou
 
 ### Datasets Used
 
-| Dataset | Matches | Features | Description |
-|---------|---------|----------|-------------|
-| **ESTA** | 1,600 | Player telemetry + economy | Detailed player-level data |
-| **Kaggle** | 31,000 | Economy only | Large-scale professional matches |
-| **Combined** | 33,000 | Merged features | Best of both datasets |
+| Dataset | Matches | Features | Description | Download Link |
+|---------|---------|----------|-------------|---------------|
+| **ESTA** | 1,558 | Player telemetry + economy | Detailed player-level data from professional tournaments (Jan 2021-May 2022) | [GitHub](https://github.com/pnxenopoulos/esta) |
+| **Kaggle** | 31,710 | Economy only | Large-scale professional matches with economic data (Nov 2015-Mar 2020) | [Kaggle](https://www.kaggle.com/datasets/christianlillelund/csgo-round-winner-classification) |
+| **Combined** | 33,268 | Merged features | Union of ESTA + Kaggle datasets | Merge both above |
 
 ### Models Evaluated
 
@@ -366,8 +366,22 @@ Every major script includes:
 - `documentation/DATA_GRANULARITY_ANALYSIS.md` - Feature engineering details
 
 ### Datasets
-- ESTA: https://github.com/skybox-sa/esta-dataset
-- Kaggle: https://www.kaggle.com/datasets/mateusdmachado/csgo-professional-matches
+
+#### ESTA Dataset
+- **Download**: https://github.com/pnxenopoulos/esta
+- **Paper**: [ESTA: An Esports Trajectory and Action Dataset](https://arxiv.org/abs/2209.09861) (arXiv:2209.09861)
+- **Description**: 1,558 parsed professional CS:GO matches with rich player telemetry including kills, deaths, damage, utility usage, and spatial positioning
+- **Format**: JSON compressed in .xz format (~1-3 MB compressed, 25-75 MB decompressed per match)
+- **Compatibility Note**: ⚠️ ESTA data is only compatible with [awpy](https://github.com/pnxenopoulos/awpy) version 1.x (not compatible with 2.x+)
+- **License**: CC BY-SA 4.0
+
+#### Kaggle CS:GO Dataset
+- **Download**: https://www.kaggle.com/datasets/christianlillelund/csgo-round-winner-classification
+- **Alternative**: https://www.kaggle.com/datasets/mvidalg/counterstrike-go-hltvorg-dataset (HLTV.org source)
+- **Description**: 31,710 professional matches with detailed economic data (equipment values, spending patterns)
+- **Time Period**: November 2015 - March 2020
+- **Format**: CSV files including Economy.csv, Results.csv, Picks.csv, Players.csv
+- **Source**: Data scraped from www.hltv.org
 
 ### External Dependencies
 See `requirements.txt` for complete list. Key libraries:
