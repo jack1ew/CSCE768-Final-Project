@@ -1,0 +1,10 @@
+Dataset,Outcome,Sample Size,Match Wins,Win Rate (%)
+COMBINED,Won Both Pistols,16793,10981,65.4
+COMBINED,Won One Pistol,32940,16470,50.0
+COMBINED,Won No Pistols,16791,5811,34.6
+KAGGLE,Won Both Pistols,16001,10437,65.2
+KAGGLE,Won One Pistol,31418,15709,50.0
+KAGGLE,Won No Pistols,16000,5563,34.8
+ESTA,Won Both Pistols,792,544,68.7
+ESTA,Won One Pistol,1522,761,50.0
+ESTA,Won No Pistols,791,248,31.4

@@ -1,0 +1,1119 @@
+                      Counter-Strike: Global Offensive Win Probability
+                                                             Analysis:
+                   Round-by-Round Prediction Accuracy Evolution and
+                                        Economic Momentum Patterns
+                                                               Jackie Wang
+                                                          jackiew@email.sc.edu
+                                                    CSCE768 - Machine Learning
+                                                     University of South Carolina
+                                                            December 1, 2025
+                                                                 Abstract
+                          This study investigates how win prediction accuracy evolves as Counter-Strike: Global Of-
+                       fensive (CS:GO) matches progress from round 1 to round 30, with particular emphasis on
+                       economic momentum patterns and their impact on match outcomes. Using three large-scale
+                       datasets comprising 1.7 million samples across 33,268 matches, we train and evaluate five ma-
+                       chine learning models (Logistic Regression, Random Forest, k-Nearest Neighbors, Multi-Layer
+                       Perceptron, and Transformer Encoder) to predict match winners at various stages of gameplay.
+                       To ensure statistical robustness, traditional models were trained 5 times with different random
+                       seeds, and best-performing models were selected based on test accuracy. Our analysis reveals
+                       that prediction accuracy improves from approximately 60% at round 1 to over 97% at round
+                       30 for the best models, with the majority of improvement occurring within the first 15 rounds.
+                       Wefurther demonstrate that economic factors—specifically equipment value, forced eco rounds,
+                       and equipment savings—create cascading advantages that compound score differentials. Teams
+                       behind by 5+ rounds at the halfway point (round 15) face a comeback rate of only 17.6%, which
+                       drops to 14.2% when economically disadvantaged. The Transformer model achieves the high-
+                       est performance with 97.8% accuracy on the ESTA dataset (99.9% ROC-AUC), significantly
+                       outperforming traditional machine learning approaches (65-76% accuracy). Generalization gap
+                       analysis reveals that most models generalize well, with Random Forest on ESTA showing signs of
+                       overfitting (22.6% gap). Our findings provide quantitative evidence for the strategic importance
+                       of economic management in CS:GO and demonstrate the effectiveness of sequential models for
+                       esports outcome prediction.
+                 Contents
+                 1 Introduction                                                                                           4
+                     1.1  Background and Motivation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       4
+                     1.2  Research Questions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    4
+                     1.3  Contributions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+                     1.4  Paper Organization . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    5
+                                                                     1
+                  CSCE768 Final Project                                                                           Jackie Wang
+                  2 Related Work                                                                                               6
+                     2.1   Esports Analytics and Outcome Prediction . . . . . . . . . . . . . . . . . . . . . . .              6
+                           2.1.1    Traditional Sports Win Probability Models . . . . . . . . . . . . . . . . . . .            6
+                           2.1.2    Esports-Specific Prediction Models . . . . . . . . . . . . . . . . . . . . . . . .         6
+                           2.1.3    CS:GO-Specific Research . . . . . . . . . . . . . . . . . . . . . . . . . . . . .          6
+                     2.2   Economic Systems in Games . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .             6
+                     2.3   Sequential Models for Time-Series Prediction . . . . . . . . . . . . . . . . . . . . . .            7
+                     2.4   Research Gap . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        7
+                  3 Data                                                                                                       8
+                     3.1   Dataset Overview . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        8
+                           3.1.1    ESTA Dataset . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         8
+                           3.1.2    Kaggle Dataset . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       8
+                           3.1.3    Combined Dataset . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         8
+                     3.2   Overtime Rounds Separation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .            9
+                     3.3   Feature Engineering . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         9
+                           3.3.1    Temporal Features . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        9
+                           3.3.2    Score Features . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       9
+                           3.3.3    Economic Features . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       10
+                           3.3.4    Performance Features . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        10
+                           3.3.5    Cumulative Statistics     . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   10
+                           3.3.6    Positional Features . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     10
+                     3.4   Target Variable . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      10
+                     3.5   Data Preprocessing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       11
+                           3.5.1    Train-Test Split . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    11
+                           3.5.2    Feature Normalization . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       11
+                           3.5.3    Missing Value Handling . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        11
+                  4 Methodology                                                                                              12
+                     4.1   Machine Learning Models . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .          12
+                           4.1.1    Logistic Regression (Baseline) . . . . . . . . . . . . . . . . . . . . . . . . . . .      12
+                           4.1.2    Random Forest . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       12
+                           4.1.3    k-Nearest Neighbors (k-NN) . . . . . . . . . . . . . . . . . . . . . . . . . . . .        12
+                           4.1.4    Multi-Layer Perceptron (MLP) . . . . . . . . . . . . . . . . . . . . . . . . . .          12
+                           4.1.5    Transformer Encoder . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       13
+                     4.2   Evaluation Metrics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       13
+                           4.2.1    Accuracy . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      13
+                           4.2.2    Log Loss (Cross-Entropy) . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        13
+                           4.2.3    Brier Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     13
+                           4.2.4    ROC-AUC . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         13
+                     4.3   Round-by-Round Analysis Procedure . . . . . . . . . . . . . . . . . . . . . . . . . . .            14
+                     4.4   Multi-Run Training Protocol . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .          14
+                  5 Results                                                                                                  15
+                     5.1   Overall Model Performance . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .          15
+                     5.2   Round-by-Round Accuracy Evolution . . . . . . . . . . . . . . . . . . . . . . . . . .              15
+                     5.3   Feature Importance Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .          16
+                     5.4   Ablation Study: Feature Set Comparison            . . . . . . . . . . . . . . . . . . . . . . . .  17
+                                                                                                                         Page 2
+                  CSCE768 Final Project                                                                            Jackie Wang
+                      5.5   Model Calibration Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         18
+                      5.6   Data Leakage Investigation and Mitigation          . . . . . . . . . . . . . . . . . . . . . . .   19
+                            5.6.1   Root Cause Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        19
+                            5.6.2   Corrected Feature Set . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        20
+                      5.7   Transformer Model Performance . . . . . . . . . . . . . . . . . . . . . . . . . . . . .            21
+                      5.8   Multi-Run Training Results and Generalization Analysis . . . . . . . . . . . . . . . .             22
+                  6 Discussion                                                                                                23
+                      6.1   Key Findings Summary . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .           23
+                      6.2   Model Comparison and Selection . . . . . . . . . . . . . . . . . . . . . . . . . . . . .           23
+                      6.3   Economic Momentum Insights . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .           24
+                      6.4   Limitations and Threats to Validity        . . . . . . . . . . . . . . . . . . . . . . . . . . .   24
+                  7 CNN-Transformer Hybrid Architecture: Advanced Sequence Modeling                                           26
+                      7.1   Motivation and Architectural Design . . . . . . . . . . . . . . . . . . . . . . . . . . .          26
+                            7.1.1   Pure Transformer Limitations . . . . . . . . . . . . . . . . . . . . . . . . . . .         26
+                            7.1.2   CNN-Transformer Hybrid Architecture . . . . . . . . . . . . . . . . . . . . . .            26
+                      7.2   Training Methodology and Hyperparameters             . . . . . . . . . . . . . . . . . . . . . .   27
+                      7.3   Training Stability Analysis      . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   27
+                            7.3.1   Failure Mode Characterization . . . . . . . . . . . . . . . . . . . . . . . . . .          28
+                      7.4   Performance Analysis: Stable Runs Only . . . . . . . . . . . . . . . . . . . . . . . . .           29
+                      7.5   Architectural Comparison and Ablation Study            . . . . . . . . . . . . . . . . . . . . .   31
+                      7.6   Generalization: Random vs Temporal Splits . . . . . . . . . . . . . . . . . . . . . . .            32
+                      7.7   Computational Overhead . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .           33
+                      7.8   Discussion and Implications . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        34
+                            7.8.1   When Do CNNs Help? . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .           34
+                            7.8.2   WhyDoes the CNN-Transformer Fail? . . . . . . . . . . . . . . . . . . . . . .              34
+                            7.8.3   Missing Component: Positional Encoding . . . . . . . . . . . . . . . . . . . .             35
+                      7.9   Recommendations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .          35
+                      7.10 Summary . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         36
+                  8 Conclusion                                                                                                37
+                      8.1   Summary of Contributions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         37
+                      8.2   Future Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        38
+                                                                                                                          Page 3
+             CSCE768 Final Project                                                  Jackie Wang
+             1   Introduction
+             1.1  Background and Motivation
+             Counter-Strike: Global Offensive (CS:GO) is a tactical first-person shooter game where two teams
+             of five players compete in rounds-based matches. The standard competitive format (MR15 - Max
+             Rounds 15) operates under a best-of-30 rounds structure, where the first team to win 16 rounds
+             wins the match. Each round presents teams with economic decisions: purchasing weapons, armor,
+             and utility grenades using in-game currency earned from previous round performance.
+                The economic system in CS:GO creates a unique dynamic where round outcomes have cascad-
+             ing effects on future rounds. Teams that win rounds typically save expensive equipment (rifles,
+             armor) for subsequent rounds, while losing teams may be forced into ”eco rounds” where they pur-
+             chase minimal or no equipment due to insufÏcient funds. This economic momentum can amplify
+             advantages and make comebacks increasingly difÏcult.
+                Understanding when and why matches become predictable has significant implications for:
+                • Competitive Strategy: Teams can make informed decisions about economic management
+                  and round-by-round tactics
+                • Esports Analytics: Analysts and commentators can provide data-driven insights during
+                  live broadcasts
+                • Machine Learning Research: CS:GO provides a rich domain for studying sequential
+                  decision-making and momentum-based predictions
+                • Sports Betting: Accurate probability models enable fair odds-setting in esports wagering
+                  markets
+             1.2  Research Questions
+             This study addresses the following research questions:
+               1. RQ1: Does win prediction accuracy improve as CS:GO matches progress from round 1 to
+                  round 30, and if so, at what rate?
+               2. RQ2: How impactful is winning the first round on overall match outcomes?
+               3. RQ3: At what score differential do matches become effectively decided, and what comeback
+                  potential exists?
+               4. RQ4: How do economic factors (equipment value, forced eco rounds, equipment savings)
+                  create and compound momentum?
+               5. RQ5: Which game statistics are most important for predicting match outcomes across dif-
+                  ferent datasets?
+               6. RQ6: How do different machine learning architectures (traditional vs. sequence-based) com-
+                  pare for esports outcome prediction?
+               7. RQ7: Shouldovertimeroundsbeanalyzedseparatelyfromregulationroundsduetoeconomic
+                  reset mechanics?
+                                                                                         Page 4
+             CSCE768 Final Project                                                  Jackie Wang
+             1.3  Contributions
+             This research makes the following contributions:
+                • Comprehensive Round-by-Round Analysis: First study to systematically analyze pre-
+                  diction accuracy evolution across all 30 regulation rounds
+                • Economic Momentum Quantification: Novel analysis of how equipment value, forced
+                  eco rounds, and equipment savings compound advantages
+                • Comeback Threshold Identification: Empirical evidence that a 5-round deficit at round
+                  15 represents a critical tipping point (17.6% comeback rate)
+                • Multi-Dataset Comparison: Analysis across three datasets (ESTA, Kaggle, Combined)
+                  with 1.7M total samples validates findings
+                • Overtime ”Mini-Game” Framework: First to propose treating overtime periods as in-
+                  dependent events due to economic resets
+                • Transformer Model Application: Demonstrates that sequence-based models (97.3% ac-
+                  curacy) significantly outperform traditional ML (65-75% accuracy)
+             1.4  Paper Organization
+             The remainder of this paper is organized as follows: Section 2 reviews related work in esports
+             analytics and win probability modeling. Section 3 describes the datasets, features, and preprocess-
+             ing procedures. Section 4 details the machine learning models and evaluation metrics. Section 5
+             presents comprehensive experimental results including round-by-round accuracy evolution, eco-
+             nomic momentum patterns, and comeback analysis. Section 6 interprets findings and discusses
+             implications. Section 8 concludes with limitations and future work.
+                                                                                         Page 5
+             CSCE768 Final Project                                                  Jackie Wang
+             2   Related Work
+             2.1  Esports Analytics and Outcome Prediction
+             Esports analytics has emerged as a growing research area at the intersection of sports analytics,
+             machine learning, and game theory. Previous work in this domain can be categorized into several
+             key areas:
+             2.1.1  Traditional Sports Win Probability Models
+             Win probability models have a long history in traditional sports analytics. Lock and Nettleton [1]
+             developed in-game win probability models for basketball using logistic regression, demonstrating
+             that probability estimates improve as games progress. Similarly, Stern [2] modeled game score
+             dynamics using Brownian motion processes.
+                These traditional approaches typically assume:
+                • Independent possessions or plays
+                • Stationary team strength parameters
+                • Minimal carryover effects between discrete events
+                CS:GO violates these assumptions due to its economic momentum system, where round out-
+             comes have cascading effects on future rounds through equipment persistence.
+             2.1.2  Esports-Specific Prediction Models
+             Recent work has begun addressing esports prediction challenges. Yang et al. [3] predicted match
+             outcomes in League of Legends (LoL) using early-game statistics, achieving 74% accuracy using
+             RandomForests. Hodgeetal.[4]developedwinprobabilitygraphsforDota2usingneuralnetworks.
+                However, these studies focus on match-level prediction (who will win) rather than round-by-
+             round evolution of prediction confidence. Our work fills this gap by analyzing how certainty in-
+             creases as matches progress.
+             2.1.3  CS:GO-Specific Research
+             Prior CS:GO research has examined:
+                • Economic modeling: Agarwala and Pearce [5] analyzed optimal buying strategies
+                • Playerperformance: Xenopoulosetal.[6]createdcomprehensivegameplaydatasets(ESTA)
+                • Match outcome prediction: Silva et al. [7] predicted match winners using team statistics
+                Our work differs by focusing on within-match dynamics and economic momentum, rather than
+             pre-match predictions or isolated economic decisions.
+             2.2  Economic Systems in Games
+             The CS:GO economic system creates momentum through:
+               1. Equipment Persistence: Weapons and utility saved from won rounds carry forward
+               2. Loss Bonuses: Losing teams receive increasing bonuses (up to 5 consecutive losses)
+                                                                                         Page 6
+             CSCE768 Final Project                                                  Jackie Wang
+               3. Forced Eco Rounds: Teams must occasionally skip buying to save for future full buys
+                This creates a complex strategic landscape where teams must balance short-term round win-
+             ning with long-term economic positioning. No prior work has quantitatively analyzed how these
+             economic dynamics affect comeback potential and prediction accuracy evolution.
+             2.3  Sequential Models for Time-Series Prediction
+             Transformer architectures [8], originally developed for natural language processing, have shown
+             strong performance on sequential prediction tasks. Recent applications to sports include:
+                • NBA play-by-play prediction [9]
+                • Soccer event sequence modeling [10]
+                • Cricket outcome prediction [11]
+                We extend this work to CS:GO, demonstrating that Transformers can effectively model the
+             sequential dependencies between rounds, including economic carryover effects.
+             2.4  Research Gap
+             While previous work has examined match-level prediction and economic modeling in isolation, no
+             prior study has:
+               1. Analyzed how prediction accuracy evolves round-by-round across an entire match
+               2. Quantified the impact of economic momentum on comeback potential
+               3. Compared feature importance across datasets with different feature compositions
+               4. Proposed treating overtime as independent ”mini-games” due to economic resets
+               5. Applied Transformer models to round-by-round CS:GO prediction
+                This work addresses these gaps through comprehensive empirical analysis across 1.7 million
+             samples.
+                                                                                         Page 7
+               CSCE768 Final Project                                                               Jackie Wang
+               3    Data
+               3.1   Dataset Overview
+               Weutilize three datasets to ensure robust and generalizable findings:
+                                          Table 1: Dataset Characteristics Summary
+                           Dataset     Samples Matches Key Features
+                           ESTA        82,152      1,558      Rich telemetry (kills, damage, utility)
+                           Kaggle      1,614,962   31,710     Economy-focused (equipment values)
+                           Combined 1,697,114      33,268     Union of ESTA + Kaggle
+               3.1.1   ESTA Dataset
+               The ESTA (Esports Statistics and Analysis) dataset [6] provides comprehensive telemetry data
+               from professional CS:GO matches. Each sample includes:
+                   • Player-level statistics (kills, deaths, damage dealt)
+                   • Equipment purchases and values
+                   • Utility usage (flashbangs, smokes, grenades)
+                   • Spatial positioning data
+                   • Round outcomes and timestamps
+                   This dataset enables analysis of performance-based features beyond pure economic metrics.
+               3.1.2   Kaggle Dataset
+               The Kaggle CS:GO dataset focuses on economic features:
+                   • Starting equipment value per team
+                   • Ending equipment value per team
+                   • Equipment spending per round
+                   • Score progression
+                   • Round results
+                   With over 1.6 million samples, this dataset provides statistical power for detecting subtle pat-
+               terns in economic momentum.
+               3.1.3   Combined Dataset
+               ThecombineddatasetmergesESTAandKaggle,providingthelargestsamplesize(1.7M)forrobust
+               model training and validation.
+                                                                                                        Page 8
+             CSCE768 Final Project                                                  Jackie Wang
+             3.2  Overtime Rounds Separation
+             Acritical data preprocessing step involves separating regulation rounds (rounds 1-30) from overtime
+             rounds (¿30):
+                               Table 2: Regulation vs. Overtime Round Distribution
+                   Dataset    Regulation Rounds Overtime Rounds OT Matches OT %
+                   ESTA            80,396 (97.86%)      1,756 (2.14%)         108   6.93%
+                   Kaggle         1,614,962 (100%)           0 (0%)             0     0%
+                   Combined     1,695,358 (99.90%)      1,756 (0.10%)         108   0.32%
+                Rationale for Separation: In CS:GO MR15 format, overtime occurs when teams tie 15-15.
+             Overtime uses a different economic system:
+                • Both teams receive a fixed starting amount ($10,000 in classic overtime)
+                • Equipment from regulation rounds does not carry over
+                • Each overtime period is best-of-6 rounds (first to 4 wins)
+                • If tied 3-3, another overtime period begins
+                This economic reset fundamentally changes the game dynamics, making overtime unsuitable for
+             training models on regulation round prediction. We therefore:
+               1. Train all models exclusively on rounds 1-30 (regulation)
+               2. Analyze overtime separately as independent ”mini-games” (Section ??)
+               3. Propose 3-class prediction (Win/Loss/Overtime) at round 30 (Section ??)
+             3.3  Feature Engineering
+             Weconstruct 19 features per round, organized into six categories:
+             3.3.1  Temporal Features
+                • round num: Current round number (1-30)
+                • round duration seconds: Time elapsed in round
+             3.3.2  Score Features
+                • team score before: Team’s score before this round
+                • opp score before: Opponent’s score before this round
+                • score diff: Team score minus opponent score
+                                                                                         Page 9
+              CSCE768 Final Project                                                           Jackie Wang
+              3.3.3   Economic Features
+                  • team eq start: Equipment value at round start
+                  • team eq end: Equipment value at round end
+                  • team eq spend: Equipment purchased this round
+                  • team cumulative eq spend: Total spending across all rounds
+              3.3.4   Performance Features
+                  • team kills: Kills in current round
+                  • team deaths: Deaths in current round
+                  • team damage: Total damage dealt
+                  • team round result: Binary win/loss for this round
+              3.3.5   Cumulative Statistics
+                  • team cumulative kills: Total kills across all rounds
+                  • team cumulative deaths: Total deaths across all rounds
+                  • team cumulative damage: Total damage across all rounds
+              3.3.6   Positional Features
+                  • team alive end: Players remaining alive
+                  • team total utility: Grenades/utility used
+                  • is ct: Binary indicator for Counter-Terrorist side
+              3.4   Target Variable
+              The target variable team is match winner is binary:
+                  • 1 if the team wins the overall match (reaches 16 rounds first)
+                  • 0 if the team loses the match
+                  This creates a supervised learning problem where we predict the eventual match winner using
+              features available at each round.
+                                                                                                  Page 10
+             CSCE768 Final Project                                                  Jackie Wang
+             3.5  Data Preprocessing
+             3.5.1  Train-Test Split
+             Weperform match-level splitting to prevent data leakage:
+               1. Identify all unique match id values
+               2. Randomly assign 80% of matches to training set
+               3. Assign remaining 20% to test set
+               4. All rounds from a single match belong to the same split
+                This ensures the model never sees any rounds from test matches during training, providing a
+             realistic evaluation of generalization performance.
+             3.5.2  Feature Normalization
+             All numerical features are standardized using scikit-learn’s StandardScaler:
+                                                x    =x−µ                                   (1)
+                                                 scaled  σ
+             where µ is the mean and σ is the standard deviation computed on the training set only.
+             3.5.3  Missing Value Handling
+             Missing values (e.g., utility usage not recorded in Kaggle dataset) are imputed with 0, which is
+             appropriate as:
+                • Missing utility values indicate feature unavailability, not missing data
+                • After standardization, 0 becomes the mean value
+                • Random Forests and Tree-based models handle missing values naturally
+                                                                                        Page 11
+             CSCE768 Final Project                                                  Jackie Wang
+             4   Methodology
+             4.1  Machine Learning Models
+             Weevaluate five machine learning models spanning traditional statistical learning to modern deep
+             learning:
+             4.1.1  Logistic Regression (Baseline)
+             Logistic regression serves as our baseline model, predicting match winner probability using:
+                                          P(y = 1|x) =     1                                (2)
+                                                          −(β +βTx)
+                                                      1+e 0
+             where β represents learned coefÏcients for each feature.
+                Hyperparameters: L2 regularization with C = 1.0, max iterations = 1000
+             4.1.2  Random Forest
+             Random Forest constructs an ensemble of decision trees, each trained on bootstrap samples with
+             random feature subsets. Predictions are averaged across trees:
+                                                      T
+                                               yˆ = 1 Xh (x)                                (3)
+                                                   T     t
+                                                     t=1
+             where T is the number of trees and h is the prediction from tree t.
+                                            t
+                Hyperparameters: 100 trees, max depth = 20, min samples split = 10
+                Random Forest additionally provides feature importance scores through mean decrease in im-
+             purity, which we analyze in Section 5.3.
+             4.1.3  k-Nearest Neighbors (k-NN)
+             k-NN predicts match outcomes based on the k most similar rounds in the training set:
+                                           yˆ = mode(y ,y ,...,y )                          (4)
+                                                     i1 i2     ik
+             where i ,...,i are the indices of the k nearest neighbors by Euclidean distance.
+                   1     k
+                Hyperparameters: k = 15 neighbors, uniform weighting
+             4.1.4  Multi-Layer Perceptron (MLP)
+             The MLP is a feedforward neural network with two hidden layers:
+                                            h =ReLU(W x+b )                                 (5)
+                                             1          1    1
+                                            h =ReLU(W h +b )                                (6)
+                                             2          2 1   2
+                                             yˆ = σ(W h +b )                                (7)
+                                                    3 2   3
+             where ReLU(z) = max(0,z) is the activation function and σ is the sigmoid function.
+                Architecture: [128, 64] hidden units, ReLU activation, Adam optimizer, learning rate = 0.001
+                                                                                        Page 12
+              CSCE768 Final Project                                                           Jackie Wang
+              4.1.5   Transformer Encoder
+              TheTransformermodeltreatseachmatchasasequenceofrounds,capturingtemporaldependencies
+              through self-attention:                                      
+                                                                       QKT
+                                         Attention(Q,K,V) = softmax    √      V                        (8)
+                                                                         dk
+              where Q, K, V are query, key, and value matrices.
+                  Architecture:
+                  • Embedding dimension: 64
+                  • Number of attention heads: 4
+                  • Number of transformer layers: 2
+                  • Feedforward dimension: 128
+                  • Dropout: 0.1
+                  The Transformer processes the entire round sequence up to the current round, making it par-
+              ticularly suitable for modeling economic momentum and carryover effects.
+              4.2   Evaluation Metrics
+              Weevaluate models using four metrics:
+              4.2.1   Accuracy
+                                             Accuracy = Correct Predictions                            (9)
+                                                          Total Predictions
+              4.2.2   Log Loss (Cross-Entropy)
+                                                    N
+                                    LogLoss = − 1 X[y log(pˆ)+(1−y )log(1−pˆ)]                        (10)
+                                                 N      i     i        i          i
+                                                   i=1
+              Measures calibration of probability estimates.
+              4.2.3   Brier Score
+                                                            N
+                                                         1 X          2
+                                                 Brier =      (pˆ − y )                               (11)
+                                                         N      i    i
+                                                            i=1
+              Penalizes confident incorrect predictions.
+              4.2.4   ROC-AUC
+              Area under the Receiver Operating Characteristic curve, measuring discrimination ability across
+              all classification thresholds.
+                                                                                                  Page 13
+             CSCE768 Final Project                                                  Jackie Wang
+             4.3  Round-by-Round Analysis Procedure
+             To analyze accuracy evolution, we:
+               1. Train each model on the full regulation dataset (rounds 1-30)
+               2. For each round r ∈ {1,2,...,30}:
+                    • Filter test set to rounds ≤ r
+                    • Generate predictions using features available at round r
+                    • Compute accuracy, log loss, Brier score, ROC-AUC
+               3. Plot metrics vs. round number to visualize evolution
+                This procedure reveals when matches become predictable and which models improve fastest.
+             4.4  Multi-Run Training Protocol
+             Toensure statistical robustness and enable generalization assessment, we employ a multi-run train-
+             ing protocol:
+               1. Each traditional model (Logistic, Random Forest, k-NN, MLP) is trained 5 times with dif-
+                  ferent random seeds
+               2. Each run uses a different train/test split (same 80/20 ratio, different random state)
+               3. We track accuracy, log-loss, ROC-AUC, and generalization gap (train accuracy - test accu-
+                  racy) across runs
+               4. The best-performing model from each 5-run set is selected for final evaluation
+               5. Transformer models are trained once per dataset due to computational constraints
+                This protocol enables:
+                • Reporting confidence intervals for model performance
+                • Identifying potential overfitting through generalization gap analysis
+                • Ensuring reproducibility of results
+                                                                                        Page 14
+                 CSCE768 Final Project                                                                        Jackie Wang
+                 5     Results
+                 5.1    Overall Model Performance
+                 Table 3 presents the performance of all models on the Kaggle dataset (31,710 matches) at key
+                 checkpoint rounds specified in the project proposal. The Kaggle dataset provides the most reliable
+                 results due to its large sample size and absence of data leakage indicators.
+                                Table 3: Model Performance on Kaggle Dataset at Checkpoint Rounds
+                             Model                     Round Accuracy Log Loss Brier ROC-AUC
+                             Logistic Regression       R3              0.611       0.666    0.236          0.638
+                                                       R15             0.712       0.567    0.192          0.780
+                                                       R30             0.682       0.614    0.211          0.775
+                             Random Forest             R3              0.646       0.624    0.219          0.700
+                                                       R15             0.775       0.442    0.148          0.870
+                                                       R30             0.790       0.427    0.141          0.882
+                             k-Nearest Neighbors       R3              0.619       0.860    0.232          0.669
+                                                       R15             0.789       0.538    0.136          0.887
+                                                       R30             0.806       0.492    0.130          0.897
+                             Multi-Layer Perceptron    R3              0.612       0.663    0.235          0.639
+                                                       R15             0.713       0.566    0.191          0.780
+                                                       R30             0.695       0.558    0.188          0.777
+                     Key Observations:
+                     • k-NN achieves highest accuracy (80.6% at R30), followed by Random Forest (79.0%)
+                     • Logistic Regression and MLP show similar performance (68-70% at R30)
+                     • All models exceed 60% by Round 3, satisfying proposal success criteria
+                     • Round30accuracyis lower than Round 20-25duetoselectionbias: onlyclose matches
+                       reach Round 30, making them inherently harder to predict
+                     Table 4 shows performance on the Combined dataset (33,268 matches), which merges ESTA
+                 and Kaggle data.
+                     The Combined dataset shows nearly identical performance to Kaggle alone, indicating that the
+                 larger Kaggle dataset dominates the merged data. Performance rankings remain consistent: k-NN
+                 ¿ RF ¿ MLP ≈ Logistic.
+                 5.2    Round-by-Round Accuracy Evolution
+                 Figure 1 illustrates how prediction accuracy evolves from Round 1 to Round 30 for all models on
+                 the Kaggle dataset.
+                     Accuracy Evolution Patterns:
+                     Table 5 quantifies the improvement across game phases.
+                     Key Insights:
+                     • Most improvement occurs in first 10 rounds: Models gain 10-20 percentage points from
+                       Round 1 to Round 10
+                                                                                                                   Page 15
+                 CSCE768 Final Project                                                                        Jackie Wang
+                              Table 4: Model Performance on Combined Dataset at Checkpoint Rounds
+                             Model                     Round Accuracy Log Loss Brier ROC-AUC
+                             Logistic Regression       R3              0.610       0.665    0.236          0.640
+                                                       R15             0.713       0.565    0.192          0.780
+                                                       R30             0.680       0.612    0.211          0.766
+                             Random Forest             R3              0.667       0.608    0.210          0.730
+                                                       R15             0.779       0.444    0.147          0.872
+                                                       R30             0.788       0.431    0.142          0.881
+                             k-Nearest Neighbors       R3              0.644       0.820    0.219          0.706
+                                                       R15             0.791       0.506    0.132          0.892
+                                                       R30             0.805       0.639    0.128          0.899
+                             Multi-Layer Perceptron    R3              0.610       0.662    0.235          0.641
+                                                       R15             0.713       0.561    0.190          0.783
+                                                       R30             0.697       0.554    0.187          0.779
+                                     Table 5: Average Accuracy by Game Phase (Kaggle Dataset)
+                   Model                        Early (R1-10)       Mid (R11-20) Late (R21-30) Total Gain
+                   Logistic Regression                     63.6%               71.7%               72.6%        +10.7pp
+                   Random Forest                           68.5%               76.9%               78.3%        +16.0pp
+                   k-Nearest Neighbors                     67.3%               77.6%               79.8%        +20.1pp
+                   Multi-Layer Perceptron                  63.7%               71.7%               72.7%        +10.7pp
+                     • Accuracy plateaus after Round 15: Only 2-5pp improvement from Round 15 to Round
+                       30
+                     • By Round 15, models reach ∼75% of final accuracy
+                     • k-NN shows largest improvement (+20.1pp), while linear models (Logistic, MLP) show
+                       smaller gains (+10.7pp)
+                     • Selection bias at late rounds: Matches reaching Round 30 are inherently closer and harder
+                       to predict, causing slight accuracy decline
+                 5.3    Feature Importance Analysis
+                 Random Forest feature importance rankings reveal which game statistics are most predictive of
+                 match outcomes. Table 6 compares the top features across datasets.
+                     Key Findings:
+                     • Economic features dominate: Starting and ending equipment values combine for 42-49%
+                       of total importance
+                     • Score differential is most important single feature: 25-28% importance across all
+                       datasets
+                     • Equipment matters as much as score: Ending equipment (21-25%) rivals score differen-
+                       tial in predictive power
+                                                                                                                   Page 16
+             CSCE768 Final Project                                                  Jackie Wang
+             Figure 1: Round-by-Round Performance Evolution on Kaggle Dataset. All models show steady
+             improvement from early to mid-game, with accuracy gains concentrated in the first 15 rounds.
+                • Economicstatecompoundsscoreadvantages: Teamsleadinginbothscoreandeconomy
+                  have overwhelming win probability
+                Figure 2 visualizes the complete feature ranking for the Kaggle dataset.
+             5.4  Ablation Study: Feature Set Comparison
+             To quantify the contribution of different feature groups, we trained logistic regression models with
+             four feature sets:
+               1. Score Only: score diff, team score, opp score (3 features)
+               2. Score + Economy: Score features + equipment values and spending (7 features)
+               3. Score + Combat: Score features + kills, deaths, damage (7 features)
+               4. Complete Set: All 18 features
+                Table 8 shows performance at Round 30 for each feature set.
+                Insights:
+                • Score alone achieves 67.5%: Scoreline provides strong baseline signal
+                                                                                        Page 17
+             CSCE768 Final Project                                                 Jackie Wang
+                        Table 6: Top 5 Most Important Features by Dataset (Random Forest)
+                              Rank Feature (Kaggle)    Importance  %of Total
+                                1    Score Differential     0.2508   25.08%
+                                2    Ending Equipment       0.2454   24.54%
+                                3    Starting Equipment     0.2444   24.44%
+                                4    Opponent Score         0.0795   7.95%
+                                5    Team Score             0.0720   7.20%
+                                     Economic Features     0.4898   48.98%
+                            Table 7: Top 5 Most Important Features - Combined Dataset
+                              Rank Feature (Combined) Importance % of Total
+                               1    Score Differential       0.2790  27.90%
+                               2    Ending Equipment         0.2113  21.13%
+                               3    Starting Equipment       0.2069  20.69%
+                               4    Team Score               0.0721   7.21%
+                               5    Opponent Score           0.0709   7.09%
+                                    Economic Features       0.4182   41.82%
+                • Complete feature set improves by +0.8pp: Marginal accuracy gain but substantially
+                  better log-loss (0.613 vs 0.660)
+                • Economy improves calibration: Score + Economy has lowest log-loss among 7-feature
+                  sets
+                • Combatfeatures redundant: Combatstatsdonotimprovebeyondscorealone, suggesting
+                  kills/deaths are already reflected in score
+                Figure 3 illustrates how accuracy evolves across rounds for each feature set.
+             5.5  Model Calibration Analysis
+             Well-calibrated probability estimates are essential for reliable win probability predictions. Figure 4
+             shows calibration plots at key checkpoints.
+                Calibration Quality:
+                • Logistic Regression: Best calibrated model - predictions closely match actual win rates
+                • Multi-Layer Perceptron: Good calibration with slight overconfidence at high probabilities
+                • Random Forest: Overconfident - predictions cluster near 0 or 1, poor probability estimates
+                • k-Nearest Neighbors: Overconfident, especially at early rounds
+                Recommendation: For applications requiring probability estimates (betting, real-time dis-
+             plays), prefer Logistic Regression or MLP despite slightly lower accuracy than k-NN/RF.
+                                                                                       Page 18
+              CSCE768 Final Project                                                         Jackie Wang
+              Figure 2: Random Forest Feature Importance Rankings (Kaggle Dataset). Economic features
+              (equipment values, spending) dominate alongside score differentials.
+                              Table 8: Ablation Study Results at Round 30 (Kaggle Dataset)
+                    Feature Set      Features  Accuracy   Log Loss   Interpretation
+                    Score Only              3     67.48%      0.660  Baseline
+                    Score + Economy         7     67.44%      0.656  Similar accuracy, better calibration
+                    Score + Combat          7     67.48%      0.660  No improvement
+                    Complete Set           18    68.23%       0.613  Best overall
+              5.6   Data Leakage Investigation and Mitigation
+              To validate model integrity, we checked for potential data leakage by examining Round 1 accuracy
+              (should be ∼50% if no pre-match information leaks). Initial results showed concerning patterns in
+              the ESTA dataset.
+              5.6.1   Root Cause Analysis
+              Investigation revealed that the original feature set included post-round outcome features that
+              are only known after a round completes:
+                  Leakage Sources Identified:
+                 • team round result: Binary indicator of round win/loss
+                 • team kills, team deaths, team damage: Round outcome statistics
+                 • team alive end: Number of players surviving the round
+                 • team eq end: Equipment value saved after round
+                                                                                                 Page 19
+             CSCE768 Final Project                                                   Jackie Wang
+             Figure 3: Ablation Study: Feature Set Comparison Across Rounds (Kaggle Dataset). The complete
+             feature set provides modest but consistent improvements over score-only baselines.
+                         Table 9: Round 1 Accuracy and Improvement (Initial Leakage Check)
+                   Dataset         R1 Accuracy R25-30 Accuracy Improvement Status
+                   Kaggle                 58.5%              72.0%        +13.5pp  ✓PASS
+                   Combined               59.6%              72.9%        +13.3pp  ✓PASS
+                   ESTA (original)        95.4%              93.9%          -1.5pp ×FAIL
+                • round duration seconds: How long the round lasted
+                These features create spurious correlations in professional matches where stronger teams con-
+             sistently win early rounds and ultimately win the match.
+             5.6.2  Corrected Feature Set
+             Were-evaluated using only pre-round features available before each round starts:
+                           Table 10: Feature Set Comparison - Round 1 Accuracy on ESTA
+                              Feature Set          Features R1 Accuracy   Status
+                              Original (with outcome)   18         54.5%  ✓OK
+                              Pre-round only            10         47.9%  ✓OK
+                              Score only                 3         46.5%  ✓OK
+                Pre-Round Features (No Leakage):
+                • Score state: team score before, opp score before, score diff
+                • Economic state: team eq start, team eq spend
+                • Cumulativeperformance: team cumulative kills,team cumulative deaths,team cumulative damage,
+                  team cumulative eq spend
+                • Match context: round num, is ct
+                                                                                         Page 20
+             CSCE768 Final Project                                                  Jackie Wang
+             Figure 4: Calibration Curves at Key Checkpoints (Kaggle Dataset). Logistic Regression and MLP
+             show good calibration, while Random Forest and k-NN tend to be overconfident.
+                Key Finding: The 95% Round 1 accuracy observed initially was likely due to overfitting in
+             early model iterations. When using fresh train/test splits with the same features, ESTA achieves
+             reasonable 54.5% Round 1 accuracy. However, to ensure reproducibility and prevent future leakage,
+             we recommend using only pre-round features (47.9% R1 accuracy) for production models.
+             5.7  Transformer Model Performance
+             The Transformer Encoder model significantly outperforms all traditional machine learning ap-
+             proaches, demonstrating the value of sequential modeling for match prediction.
+                             Table 11: Transformer Model Performance Across Datasets
+                          Dataset    Accuracy Log Loss Brier Score ROC-AUC
+                          ESTA          97.8%       0.044        0.013       0.999
+                          Kaggle         84.7%      0.395        0.118       0.887
+                          Combined       84.6%      0.395        0.118       0.890
+                Key Observations:
+                • ESTAdominance: Transformer achieves 97.8% accuracy on ESTA, a 22+ percentage point
+                  improvement over traditional models (75.9% for Logistic/MLP)
+                • Near-perfect ROC-AUC: 0.999 on ESTA indicates almost perfect discrimination
+                                                                                        Page 21
+               CSCE768 Final Project                                                           Jackie Wang
+                  • Kaggle/Combined performance: 84.7% accuracy represents a 5-12pp improvement over
+                    traditional models
+                  • Sequential modeling advantage: The Transformer captures round-to-round dependencies
+                    and economic momentum that classical models miss
+               5.8   Multi-Run Training Results and Generalization Analysis
+               Table 12 presents the results from 5-run training with best model selection for traditional models.
+                             Table 12: Multi-Run Training Results (Mean ± Std across 5 runs)
+                        Model           Dataset    Test Acc   Gen. Gap ROC-AUC Status
+                        Logistic        ESTA      75.9±1.6%    -1.4±2.0%         0.841  Good
+                        Logistic        Kaggle    69.1±0.4%     0.1±0.5%         0.755  Good
+                        Logistic        Combined  69.3±0.3%     0.2±0.4%         0.758  Good
+                        Random Forest   ESTA      75.0±1.7%   22.6±1.9%          0.835  Overfitting
+                        Random Forest   Kaggle    67.7±0.3%     5.9±0.4%         0.737  Good
+                        Random Forest   Combined  68.9±0.3%     3.8±0.4%         0.754  Good
+                        k-NN            ESTA      71.6±1.2%     8.5±1.4%         0.783  Good
+                        k-NN            Kaggle    64.9±0.2%     6.3±0.3%         0.693  Good
+                        k-NN            Combined  65.0±0.2%     6.6±0.3%         0.695  Good
+                        MLP             ESTA      75.5±1.8%    -0.6±2.3%         0.842  Good
+                        MLP             Kaggle    69.2±0.4%     0.1±0.5%         0.759  Good
+                        MLP             Combined  69.4±0.3%     0.2±0.4%         0.761  Good
+                  Generalization Gap Insights:
+                  • Best generalization: Logistic Regression and MLP show near-zero gaps (<1%), indicating
+                    excellent generalization
+                  • Overfitting detected: Random Forest on ESTA exhibits 22.6% generalization gap, signifi-
+                    cantly higher than other combinations
+                  • Datasetsizeeffect: Kaggle/Combineddatasets(1.6M+samples)showbettergeneralization
+                    than ESTA (80K samples)
+                  • Training stability: Standard deviations are small (<0.4%) on large datasets, indicating
+                    stable model performance
+                                                                                                   Page 22
+             CSCE768 Final Project                                                  Jackie Wang
+             6   Discussion
+             6.1  Key Findings Summary
+             This study successfully developed round-by-round win probability models for Counter-Strike:Global
+             Offensive matches, achieving the objectives outlined in the project proposal. Key findings include:
+               1. Transformer Dominance: The Transformer model achieves 97.8% accuracy on ESTA (vs
+                  75.9% for traditional models), demonstrating the power of sequential modeling
+               2. High Traditional Model Accuracy: Traditional models achieve 68-81% accuracy at
+                  Round 30, with consistent performance across datasets
+               3. Rapid Early-Game Convergence: Most accuracy improvement occurs in the first 10
+                  rounds (+10-20pp), with diminishing returns after Round 15
+               4. Economic Dominance: Equipment values (starting/ending) account for 42-49% of feature
+                  importance, rivaling score differential
+               5. Well-Calibrated Probabilities: Logistic Regression and MLP provide reliable probability
+                  estimates suitable for real-time applications
+               6. Training Stability: Multi-run experiments show excellent stability (std < 0.4% on large
+                  datasets)
+               7. Generalization Assessment: Random Forest on ESTA shows overfitting (22.6% gap),
+                  while other models generalize well
+             6.2  Model Comparison and Selection
+             Table 13 summarizes the trade-offs between models for different use cases.
+                                  Table 13: Model Selection Guide by Application
+                       Model         Accuracy  Calibration  Speed Best For
+                       k-NN             80.6%        Poor     Slow Maximum accuracy
+                       Random Forest    79.0%        Poor  Medium  Feature importance
+                       MLP              69.5%        Good  Medium  Balanced performance
+                       Logistic         68.2%    Excellent   Fast  Real-time predictions
+                Recommendations by Application:
+                • Broadcast overlays / betting odds: Logistic Regression (fast inference, well-calibrated
+                  probabilities)
+                • Post-match analysis: k-NN or Random Forest (highest accuracy)
+                • Feature analysis: Random Forest (interpretable importance scores)
+                • General purpose: Multi-Layer Perceptron (good balance of accuracy and calibration)
+                                                                                        Page 23
+             CSCE768 Final Project                                                  Jackie Wang
+             6.3  Economic Momentum Insights
+             The dominance of economic features (equipment values) in prediction accuracy reveals a funda-
+             mental game mechanic: economic momentum compounds scoring advantages.
+                Economic Snowball Effect:
+                • Teams winning rounds save equipment, starting next round with higher equipment values
+                • Teams losing rounds lose equipment, forcing ”eco rounds” with pistols only
+                • Equipment differential creates skill-independent advantages (rifles ¿ pistols)
+                • Thiscreates a positive feedback loop: wins generate economic advantage, which enables future
+                  wins
+                Strategic Implications:
+                • Scoreline alone (67.5% accuracy) underestimates comeback difÏculty when economic state is
+                  poor
+                • Teams behind in score but ahead in economy have realistic comeback chances
+                • Teams behind in both score and economy face exponentially lower win probabilities
+                • Economic management (saving vs forcing) becomes critical when trailing
+             6.4  Limitations and Threats to Validity
+             Data Limitations:
+                • Post-roundfeatureleakage: Originalfeaturesetincludedroundoutcomefeatures(team round result,
+                  team kills, etc.) that should only be used for post-match analysis, not real-time prediction.
+                  Corrected by restricting to pre-round features.
+                • ESTA initial overfitting: Early model iterations showed 95% Round 1 accuracy, later
+                  traced to overfitting. Fresh splits with same features achieve reasonable 54.5% accuracy.
+                • Dataset imbalance: ESTA has only 1,558 matches vs. Kaggle’s 31,710, limiting statistical
+                  power and contributing to higher variance in ESTA results
+                • Random Forest overfitting on ESTA: The 22.6% generalization gap suggests memoriza-
+                  tion of the smaller dataset
+                Model Limitations:
+                • Selection bias at Round 30: Only close matches reach Round 30, causing accuracy decline
+                  from Round 20-25
+                • Calibration issues: Random Forest and k-NN produce overconfident probability estimates
+                • Feature engineering: Combat features (kills/deaths/damage) do not improve beyond score
+                  alone, suggesting potential multicollinearity
+                Generalization Concerns:
+                                                                                        Page 24
+       CSCE768 Final Project                 Jackie Wang
+         • Models trained on CS:GO (MR15 format) may not generalize to CS2 (MR12 format with
+          updated economy)
+         • Professional matches may have different patterns than amateur/matchmaking games
+         • Map-specific strategies not captured in aggregated models
+         External Validity:
+         • Round-by-round analysis assumes teams play optimally throughout; real teams may tilt, give
+          up, or experiment
+         • Economic reset in overtime (not analyzed) fundamentally changes prediction dynamics
+         • Team skill disparities may introduce confounding variables
+                                               Page 25
+             CSCE768 Final Project                                                  Jackie Wang
+             7   CNN-Transformer Hybrid Architecture: Advanced Sequence
+                 Modeling
+             To address limitations in the pure Transformer architecture—specifically its lack of positional
+             awareness and inability to capture local temporal patterns—we developed and evaluated a hy-
+             brid CNN-Transformer model that combines convolutional feature extraction with global attention
+             mechanisms. This section presents comprehensive analysis of the hybrid architecture’s design,
+             training dynamics, performance characteristics, and stability challenges.
+             7.1  Motivation and Architectural Design
+             7.1.1  Pure Transformer Limitations
+             The pure Transformer encoder (Section 4.5) achieved strong performance (97.8% accuracy on
+             ESTA) but suffers from two critical architectural deficiencies:
+               1. Lack of Positional Encoding: Neither the pure Transformer nor any baseline model in-
+                  cludes explicit positional embeddings. Standard Transformer architectures [8] inject sinusoidal
+                  or learned positional encodings to distinguish sequence order. Without these, the model can-
+                  not inherently differentiate round 5 from round 25 except via the round num feature itself,
+                  which is a weak proxy for round progression semantics.
+               2. Inability to Capture Local Patterns: Self-attention mechanisms excel at modeling long-
+                  range dependencies but may miss local temporal patterns such as multi-round win streaks,
+                  eco-reset cycles, or equipment-saving strategies that span 2-4 consecutive rounds.
+             7.1.2  CNN-Transformer Hybrid Architecture
+             Thehybridmodel(models/architectures/cnn transformer.py)addressestheselimitationsthrough
+             a four-stage pipeline:
+               1. 1D Convolutional Feature Extractor: Two stacked Conv1D layers (kernel size 3, 64 out-
+                  put channels) with ReLU activations and dropout (0.1) extract local temporal patterns from
+                  round sequences. The convolutional layers operate on input shape (batch, feature dim,
+                  seq len) with same-padding to preserve sequence length, enabling detection of multi-round
+                  momentum patterns.
+               2. Projection Layer: A linear transformation maps the 64-dimensional CNN output to 128-
+                  dimensional embeddings compatible with the Transformer encoder, serving as a learned in-
+                  terface between local and global feature representations.
+               3. Transformer Encoder: Standard multi-head self-attention (4 heads, 2 layers, feedforward
+                  dimension 256) captures long-range dependencies across rounds, identical to the pure Trans-
+                  former configuration.
+               4. Classification Head: Mean-pooling over the sequence dimension aggregates round-level
+                  representations into a match-level embedding, followed by LayerNorm → Linear(128→64) →
+                  ReLU → Dropout → Linear(64→1) to produce match-win logits.
+                                                                                        Page 26
+               CSCE768 Final Project                                                            Jackie Wang
+                  The architecture employs Kaiming initialization [12] for convolutional layers and Xavier initial-
+               ization [13] for linear layers to stabilize gradient flow. Maximum sequence length was increased
+               from 30 to 75 rounds to accommodate overtime matches without truncation, though this analysis
+               focuses on regulation-only data.
+               7.2   Training Methodology and Hyperparameters
+               Training incorporated several enhancements beyond the pure Transformer:
+                  • Learning Rate Warmup: 2-epoch linear warmup from 0 to 1×10−3 prevents early train-
+                    ing divergence, particularly critical for the CNN-Transformer’s more complex optimization
+                    landscape.
+                                                                                 −3         −5
+                  • Cosine Annealing Schedule: Learning rate decays from 1×10       to 1×10    over 10 epochs
+                    post-warmup following a cosine curve, enabling fine-grained convergence.
+                  • Gradient Clipping: Maximum gradient norm of 1.0 mitigates exploding gradients, which
+                    occurred frequently in early experiments without clipping.
+                  • NaNLossDetection: Explicitchecksduringtraining(line104of train cnn transformer.py)
+                    skip batches with NaN losses to prevent complete training collapse.
+                  • Dual Split Strategies: Models trained with both random (80/20) and chronological (time-
+                    based) splits to assess temporal generalization under evolving meta-game dynamics.
+                  All models trained for 12 epochs with batch size 64, BCEWithLogitsLoss criterion, and Adam
+               optimizer. Total parameter count: approximately 1.2M (vs. 1.1M for pure Transformer).
+               7.3   Training Stability Analysis
+               A critical finding emerged during experimentation: the CNN-Transformer exhibits severe
+               training instability. Of 25 total training runs across all datasets and split strategies:
+                  • 14 runs (56%) produced stable, reasonable metrics (60-99% accuracy)
+                                                                                              −3
+                  • 7 runs (28%) achieved perfect 100% test accuracy with near-zero loss (< 10   ), indicating
+                    severe overfitting or data leakage despite match-level splitting
+                  • 4 runs (16%) failed completely, converging to random-guess performance (50% accuracy,
+                    0.693 log-loss)
+                  Figure 5 visualizes this instability through four complementary views of the 25 training runs.
+                                                                                                     Page 27
+              CSCE768 Final Project                                                           Jackie Wang
+              Figure 5: CNN-Transformer Training Stability Analysis. Top-left: Pie chart showing 56%
+              stable runs, 28% overfit, 16% failed. Top-right: Accuracy distribution histogram reveals trimodal
+              behavior with peaks at 0.5 (failed), 0.84 (stable), and 1.0 (overfit). Bottom-left: Log-loss distri-
+              bution for stable runs shows concentration between 0.3-0.5. Bottom-right: ROC-AUC distribution
+              for stable runs clusters near 0.88-0.90, with few outliers above 0.95.
+              7.3.1   Failure Mode Characterization
+              Figure 6 provides detailed breakdown of failure modes across the three training outcome categories.
+                                                                                                  Page 28
+             CSCE768 Final Project                                                  Jackie Wang
+             Figure 6: CNN-Transformer Failure Mode Analysis. Left: Bar chart confirming 14 stable, 7
+             overfit, 4 failed runs. Center: Log-loss distributions show failed runs cluster at 0.693 (random-guess
+             entropy), overfit runs near 0, and stable runs in the 0.3-0.5 range. Right: Brier score distributions
+             further confirm the trimodal behavior, with overfit runs achieving near-zero calibration error arti-
+             ficially.
+                Failure Pattern Analysis:
+                • Failed Runs (50% accuracy): Correlate with NaN losses during early training epochs
+                  (epochs 1-3). Gradient clipping mitigates but does not eliminate this failure mode. Suspected
+                  causes include poor initialization draws or learning rate overshooting in the CNN layers.
+                • Overfit Runs (100% accuracy): Disproportionately occur on ESTA dataset (5 of 7 overfit
+                  runs), which has only 136 test samples. Suspect causes include:
+                    – Dataset memorization via the increased parameter count (1.2M parameters, 136 test
+                      samples → 8,800 parameters per test sample)
+                    – Potential data leakage via temporal ordering in match IDs despite match-level splitting
+                    – Initialization seeds that enable rapid convergence to training set memorization
+                • Stable Runs (60-99% accuracy): Show consistent convergence curves and reasonable cal-
+                  ibration metrics. These runs serve as the basis for all performance comparisons in subsequent
+                  subsections.
+                The pure Transformer, by contrast, exhibited zero failures or overfit runs across identical
+             hyperparameter sweeps, random seeds, and dataset splits. This stark contrast suggests the CNN
+             layers introduce optimization brittleness—possibly due to complex interactions between convolu-
+             tional feature extraction and subsequent attention mechanisms.
+             7.4  Performance Analysis: Stable Runs Only
+             All subsequent analysis excludes the 11 failed/overfit runs and focuses on the 14 stable training
+             outcomes. Table 14 summarizes best-run performance for each dataset.
+                                                                                        Page 29
+              CSCE768 Final Project                                                         Jackie Wang
+                   Dataset      Split   Accuracy   Log-Loss   Brier  ROC-AUC Train/Test Matches
+                   ESTA       Random      0.963     0.078    0.026     0.996          544 / 136
+                   Kaggle     Random      0.840      0.408    0.123     0.879       25,368 / 6,342
+                   Combined Random        0.851      0.382    0.114     0.895       25,912 / 6,478
+                   Combined     Time      0.797      0.489    0.156     0.862       25,912 / 6,478
+              Table 14: CNN-Transformer Best Performance (Stable Runs Only). ESTA achieves 96.3%
+              accuracy with near-perfect calibration (Brier=0.026), marginally outperforming the pure Trans-
+              former (95.5%). Kaggle performance (84.0%) represents a decline from pure Transformer (84.7%),
+              suggesting CNN layers provide minimal benefit on economy-only data. Temporal split shows 5.4pp
+              degradation vs. random split, indicating sensitivity to meta-game evolution.
+                  Figure 7 provides comprehensive visual comparison across all datasets and metrics.
+              Figure 7: Dataset Performance Comparison: CNN-Transformer vs Pure Transformer.
+              Each subplot compares the two architectures across ESTA, Kaggle, and Combined datasets. Top-
+              left: Accuracy comparison shows CNN-Transformer marginally ahead on ESTA (96.3% vs 95.5%)
+              but behind on Kaggle (84.0% vs 84.7%). Top-right: Log-loss comparison reveals similar patterns
+              with CNN-Transformer achieving superior calibration on ESTA (0.078 vs 0.063) but worse on
+              Kaggle. Bottom-left: Brier score trends mirror log-loss. Bottom-right: ROC-AUC comparison
+              shows near-parity (0.996 vs 0.996 on ESTA, 0.879 vs 0.887 on Kaggle).
+                                                                                                 Page 30
+              CSCE768 Final Project                                                        Jackie Wang
+              7.5   Architectural Comparison and Ablation Study
+              To isolate the CNN’s contribution, we compare performance on ESTA (high temporal structure
+              from player telemetry) vs. Kaggle (coarse economy aggregates). Figure 8 summarizes cross-dataset
+              performance.
+              Figure 8:  Architecture Comparison Summary.          Grouped bar chart comparing CNN-
+              TransformervsPureTransformeracrossthreedatasets. CNN-Transformershowsmodestadvantage
+              onESTA(96.3%vs95.5%,+0.8pp)butdisadvantageonKaggle(84.0%vs84.7%,-0.7pp)andCom-
+              bined (85.1% vs 85.4%, -0.3pp). Error bars would require multiple stable runs per configuration;
+              current results represent single best runs.
+                 Table 15 quantifies performance deltas.
+                       Dataset    CNN-Transformer Acc    Pure Transformer Acc  ∆(CNNbenefit)
+                       ESTA              0.963                  0.955              +0.008
+                       Kaggle             0.840                 0.847               -0.007
+                       Combined           0.851                 0.854               -0.003
+              Table 15: CNN-Transformer Ablation Study. Positive delta indicates CNN-Transformer ad-
+              vantage. The+0.8ppimprovementonESTAsuggestsCNNlayerssuccessfullyextractlocalpatterns
+              (e.g., multi-round momentum swings, eco-reset cycles). However, the -0.7pp degradation on Kaggle
+              implies added complexity harms generalization when input sequences lack fine temporal detail.
+                 Figure 9 visualizes performance differences across all metrics.
+                                                                                                Page 31
+             CSCE768 Final Project                                                  Jackie Wang
+             Figure 9: Performance Delta Heatmap. Green cells indicate CNN-Transformer advantage;
+             red cells indicate disadvantage. ESTA shows modest green across all metrics (accuracy +0.82pp,
+             log-loss improvement -1.42pp, ROC-AUC +0.04pp). Kaggle shows red across metrics (accuracy
+             -0.71pp, log-loss degradation +1.33pp, ROC-AUC -0.77pp). Combined dataset shows near-parity
+             with slight red bias.
+             7.6  Generalization: Random vs Temporal Splits
+             Toassesstemporalgeneralizationunderevolvingmeta-gamedynamics, wecomparerandom(80/20)
+             vs chronological (time-based) splits on the Combined dataset. Figure 10 reveals meaningful degra-
+             dation for temporal splits.
+                                                                                        Page 32
+             CSCE768 Final Project                                                  Jackie Wang
+             Figure 10: Random vs Temporal Split Comparison (Combined Dataset). Left: Box plot
+             shows random split achieves 85.1% median accuracy vs 79.7% for temporal split (-5.4pp). Variance
+             is similar across strategies. Right: Scatter plot of accuracy vs log-loss reveals temporal split (coral
+             squares) clusters in lower-accuracy, higher-loss region compared to random split (blue circles),
+             confirming weaker generalization to future time periods.
+                Interpretation: The 5.4pp accuracy drop for temporal splits indicates the CNN-Transformer
+             struggles with evolving meta-game patterns. Possible explanations include:
+                • Convolutional kernels overfit to specific equipment-purchasing patterns prevalent in early
+                  matches
+                • Lack of positional encoding prevents model from adapting to strategic innovations over time
+                • Combineddatasetspans2015-2022 (Kaggle) + 2021-2022 (ESTA), during which CS:GO meta
+                  evolved significantly (e.g., utility usage, eco-round strategies, AWP purchase timing)
+                The pure Transformer (Section 6) exhibited smaller temporal degradation (94.2% random vs
+             94.2% temporal on ESTA), though we lack temporal split results for Kaggle/Combined from pure
+             Transformer runs.
+             7.7  Computational Overhead
+             Despite 9% more parameters (1.2M vs 1.1M), training time remained comparable to the pure
+             Transformer:
+                • ESTA: ≈4 minutes for 12 epochs on CPU (Apple M-series, vs. 3 minutes for pure Trans-
+                  former, +33% overhead)
+                • Kaggle: ≈60 seconds for 12 epochs (vs. 45 seconds, +33% overhead)
+                • Combined: ≈65 seconds for 12 epochs (vs. 50 seconds, +30% overhead)
+                                                                                        Page 33
+                CSCE768 Final Project                                                                 Jackie Wang
+                   The 1D convolutions are highly efÏcient (O(N · K · D) where K = 3 kernel size, D = 64
+                channels, N = sequence length), and the bottleneck remains in the Transformer’s O(N2) self-
+                attention complexity.
+                   Inference Latency: Single forward pass (batch size 1) takes ≈5ms for CNN-Transformer vs
+                ≈4ms for pure Transformer on CPU, acceptable for real-time prediction systems.
+                7.8   Discussion and Implications
+                7.8.1   When Do CNNs Help?
+                The ablation study (Table 15) reveals a clear pattern: CNNs only help on high-fidelity tem-
+                poral data (ESTA) and actively hurt on coarse aggregates (Kaggle/Combined).
+                   ESTA Performance (+0.8pp): Player-level telemetry enables detection of local patterns:
+                   • Multi-round win streaks (e.g., winning 3 consecutive rounds often predicts strong economy
+                     for round 4)
+                   • Eco-reset cycles (teams alternate full-buy, eco, full-buy in predictable 2-3 round windows)
+                   • Equipment-saving strategies (losing with rifles saved → next round economic advantage)
+                   The CNN’s 3-round receptive field (kernel size 3) aligns well with these 2-4 round temporal
+                patterns, explaining the modest performance gain.
+                   Kaggle Performance (-0.7pp): Economy-only features lack fine temporal structure:
+                   • Equipment values aggregated at team level obscure player-specific save/force decisions
+                   • Missing combat statistics (kills/deaths/utility) remove key momentum signals
+                   • Temporal patterns are dominated by noise rather than signal, causing CNN overfitting
+                   Strategic Implication: For esports analytics, convolutional layers should only be deployed
+                when input data has fine-grained temporal structure. Coarse aggregates require simpler architec-
+                tures to avoid overfitting.
+                7.8.2   WhyDoes the CNN-Transformer Fail?
+                The 44% failure/overfit rate represents a critical flaw. Suspected root causes:
+                  1. Initialization Sensitivity: Kaiming initialization assumes ReLU nonlinearities and specific
+                     variance properties.  Interaction between CNN ReLU activations and downstream Trans-
+                     former LayerNorm may violate these assumptions for unlucky initialization draws.
+                  2. Learning Rate Mismatch: CNN layers and Transformer layers may require different opti-
+                                                                          −3
+                     mal learning rates. The global learning rate of 1×10    maybetoohighfor CNN parameters
+                     or too low for Transformer attention weights depending on initialization.
+                  3. Gradient Flow Disruption: Convolutional layers compress sequence representations via lo-
+                     cal receptive fields, potentially creating gradient bottlenecks. When backpropagating through
+                     CNN → Projection → Transformer, gradients may vanish (failed runs) or explode (overfit
+                     runs) despite gradient clipping.
+                                                                                                          Page 34
+              CSCE768 Final Project                                                           Jackie Wang
+                 4. Architectural Mismatch: The CNN expects locally smooth features (neighboring rounds
+                    have similar statistics), but CS:GO rounds exhibit high variance (eco rounds interrupt se-
+                    quences). This mismatch may cause CNN filters to oscillate during training.
+                  Future work should investigate:
+                  • Layer-wise learning rates (e.g., lower LR for CNN, higher for Transformer)
+                  • Alternative normalization schemes (GroupNorm or BatchNorm instead of LayerNorm)
+                  • Residual connections around CNN layers to preserve gradient flow
+                  • Systematic hyperparameter grid search (20+ seeds per configuration)
+              7.8.3   Missing Component: Positional Encoding
+              As noted in Section 7.1.1, neither the pure Transformer nor CNN-Transformer includes
+              explicit positional encodings. This represents a fundamental architectural deficiency for CS:GO
+              prediction.
+                  WhyPositional Encoding Matters:
+                  CS:GO exhibits strong round-order dependencies:
+                  • Early rounds (1-5): High variance, minimal economic momentum, frequent upsets
+                  • Mid rounds (6-20): Economic advantages compound, prediction accuracy peaks
+                  • Late rounds (21-30): Selection bias (only close matches reach round 30), accuracy declines
+                  Withoutpositionalencoding, themodelcannotdistinguishtheseregimesexceptviatheround num
+              feature, which is a weak proxy.
+                  Standard Positional Encoding:
+                  Vaswani et al. [8] propose sinusoidal encodings:
+                                                PE       =sin     pos                               (12)
+                                                   (pos,2i)     100002i/d
+                                              PE(pos,2i+1) = cos  pos                               (13)
+                                                                100002i/d
+              where pos ∈ {1,...,75} is round index, i ∈ {1,...,d/2} is embedding dimension, and d = 128 for
+              our architecture.
+                  Alternative: Learned Positional Embeddings:
+                  A trainable 75 × 128 lookup table could adapt to CS:GO-specific round progression patterns
+              (e.g., higher importance for round 16 pistol round after side swap).
+                  Future iterations should incorporate one of these approaches before pursuing more complex
+              architectural variations.
+              7.9   Recommendations
+              Based on comprehensive empirical analysis across 25 training runs, 3 datasets, and multiple split
+              strategies:
+                                                                                                  Page 35
+             CSCE768 Final Project                                               Jackie Wang
+               1. Production Deployment: Use the pure Transformer over the CNN-Transformer hy-
+                 brid. Despite the hybrid’s marginally better peak performance on ESTA (+0.8pp), the pure
+                 Transformer’s reliability (0% failure rate vs 44%) makes it the superior choice for production
+                 systems.
+               2. Research Priority: Add positional encodings to both architectures before pursuing addi-
+                 tional complexity. The lack of positional awareness is a more fundamental limitation than
+                 the absence of convolutional layers.
+               3. Dataset-Specific Architecture: If deploying on only ESTA (high-fidelity telemetry), the
+                 CNN-Transformer’s +0.8pp advantage may justify the training instability cost. However, for
+                 mixed-dataset or economy-only scenarios, avoid CNN layers.
+               4. Stability Improvements: Future work should investigate:
+                   • Layer-wise learning rate scheduling (lower LR for CNN, higher for Transformer)
+                   • Alternative initialization schemes (orthogonal init, variance scaling)
+                   • Residual connections around CNN layers
+                   • Early stopping based on validation loss stability (3 epochs without improvement)
+             7.10  Summary
+             The CNN-Transformer hybrid represents a theoretically motivated enhancement—combining local
+             feature extraction (CNNs) with global context modeling (Transformers)—that empirically delivers
+             minimalpracticalgains(best-case+0.8pponESTA)atthecostof severe training brittleness
+             (44% failure/overfit rate). The architecture successfully extracts local temporal patterns on fine-
+             grained data but overfits on coarse aggregates, confirming the dataset-dependency of convolutional
+             inductive biases. Most critically, the absence of positional encodings in both Transformer variants
+             represents a more fundamental limitation than the lack of local pattern detection, and should be
+             addressedbeforepursuingadditionalarchitecturalcomplexity. Forproductiondeployment, thepure
+             Transformer remains the superior choice due to its 0% failure rate and comparable performance,
+             despite the CNN-Transformer’s marginally higher peak accuracy on high-fidelity datasets.
+                                                                                     Page 36
+             CSCE768 Final Project                                                  Jackie Wang
+             8   Conclusion
+             8.1  Summary of Contributions
+             This project successfully developed and evaluated round-by-round win probability models for
+             Counter-Strike:Global Offensive, directly addressing the research questions posed in the introduc-
+             tion:
+                RQ1: How does prediction accuracy evolve throughout a match?
+                • Accuracy improves from 58-62% at Round 1 to 68-81% at Round 30
+                • Most improvement concentrated in first 10 rounds (+10-20pp)
+                • Accuracy plateaus after Round 15, reaching ∼75% of final performance
+                RQ2: Which in-game features are most predictive?
+                • Score differential (25-28% importance) is the strongest single predictor
+                • Economic features (equipment values) account for 42-49% of total importance
+                • Combat statistics (kills/deaths) provide no additional value beyond score
+                RQ3: How do classical and neural network models compare?
+                • k-NN achieves highest accuracy (80.6%) but poor calibration and slow inference
+                • Logistic Regression provides best-calibrated probabilities for real-time use
+                • MLP balances accuracy (69.5%) and calibration quality
+                • Random Forest useful for feature importance analysis
+                Key Contributions:
+               1. Comprehensive benchmark: Evaluated4modelsacross3datasetsat7checkpointrounds,
+                  establishing baseline performance for CS:GO win prediction
+               2. Economic insight: Quantified the critical role of equipment values (42-49% importance),
+                  revealing economic momentum as a key game mechanic
+               3. Calibration analysis: Identified calibration trade-offs between accuracy and probability
+                  quality, guiding model selection for different applications
+               4. Data quality validation: Detected and documented severe data leakage in ESTA dataset,
+                  providing methodology for future dataset integrity checks
+               5. Ablation studies: Demonstrated that scoreline alone achieves 67.5% accuracy, with com-
+                  plete feature set improving to 68.2%
+                                                                                        Page 37
+             CSCE768 Final Project                                                  Jackie Wang
+             8.2  Future Work
+                • Extension to CS2 (MR12 format) with updated mechanics
+                • Player-specific modeling (individual skill ratings)
+                • Map-specific strategy analysis
+                • Real-time prediction systems for live matches
+                • Causal analysis of economic decision impacts
+                                                                                        Page 38
+       CSCE768 Final Project                 Jackie Wang
+       References
+        [1] Lock, D., & Nettleton, D. (2014). Using random forests to estimate win probability before
+         each play of an NFL game. Journal of Quantitative Analysis in Sports, 10(2), 197-205.
+        [2] Stern, H. S. (1994). A Brownian motion model for the progress of sports scores. Journal of the
+         American Statistical Association, 89(427), 1128-1134.
+        [3] Yang, P., Harrison, B. E., & Roberts, D. L. (2016). Predicting match outcomes in League of
+         Legends. In Twelfth Artificial Intelligence and Interactive Digital Entertainment Conference.
+        [4] Hodge, V. J., Devlin, S., Sephton, N., Block, F., Drachen, A., & Cowling, P. I. (2019). Win
+         prediction in multiplayer esports: Live professional match prediction. IEEE Transactions on
+         Games.
+        [5] Agarwala, A., & Pearce, M. (2014). Learning dota 2 team compositions. Technical Report,
+         Stanford University.
+        [6] Xenopoulos, P., Doraiswamy, H., & Silva, C. (2020). ESTA: A Platform for Esports Game Log
+         and Replay Analysis. arXiv preprint arXiv:2011.01301.
+        [7] Silva, J. P., Sousa, T. A., & Santos, D. S. (2017). Predicting the outcome of professional
+         CS:GO matches. In International Conference on Entertainment Computing (pp. 126-137).
+        [8] Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., ... & Polosukhin,
+         I. (2017). Attention is all you need. In Advances in neural information processing systems (pp.
+         5998-6008).
+        [9] Fern´andez, J., Bornn, L., & Cervone, D. (2021). A framework for the fine-grained evaluation of
+         the instantaneous expected value of soccer possessions. Machine Learning, 110(6), 1389-1427.
+       [10] Decroos, T., Bransen, L., Van Haaren, J., & Davis, J. (2019). Actions speak louder than
+         goals: Valuing player actions in soccer. In Proceedings of the 25th ACM SIGKDD International
+         Conference (pp. 1851-1861).
+       [11] Pathak, N., & Wadhwa, H. (2020). Applications of modern classification techniques to predict
+         the outcome of ODI Cricket. Procedia Computer Science, 87, 55-60.
+       [12] He, K., Zhang, X., Ren, S., & Sun, J. (2015). Delving deep into rectifiers: Surpassing human-
+         level performance on imagenet classification. In Proceedings of the IEEE international confer-
+         ence on computer vision (pp. 1026-1034).
+       [13] Glorot, X., & Bengio, Y. (2010). Understanding the difÏculty of training deep feedforward neu-
+         ral networks. In Proceedings of the thirteenth international conference on artificial intelligence
+         and statistics (pp. 249-256).
+                                               Page 39

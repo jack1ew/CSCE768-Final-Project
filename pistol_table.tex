@@ -1,0 +1,31 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{llcr}
+\toprule
+\textbf{Dataset} & \textbf{Outcome} & \textbf{Win Rate} & \textbf{N} \\
+\midrule
+KAGGLE & Both Pistols & 65.2\% & 16,001 \\
+KAGGLE & One Pistol & 50.0\% & 31,418 \\
+KAGGLE & No Pistols & 34.8\% & 16,000 \\
+\midrule
+ESTA & Both Pistols & 68.7\% & 792 \\
+ESTA & One Pistol & 50.0\% & 1,522 \\
+ESTA & No Pistols & 31.4\% & 791 \\
+\midrule
+COMBINED & Both Pistols & 65.4\% & 16,793 \\
+COMBINED & One Pistol & 50.0\% & 32,940 \\
+COMBINED & No Pistols & 34.6\% & 16,791 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

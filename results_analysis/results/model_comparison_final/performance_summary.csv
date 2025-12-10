@@ -1,0 +1,7 @@
+model,accuracy,roc_auc,log_loss,brier_score,model_name
+logistic,0.7148,0.7853,0.555,0.1881,Logistic Regression
+random_forest,0.6942,0.76,0.6142,0.2014,Random Forest
+knn,0.6739,0.7256,2.3939,0.2286,k-Nearest Neighbors
+mlp,0.7149,0.7897,0.5486,0.1861,Multi-Layer Perceptron
+transformer,0.8901,0.9246,0.2798,0.0838,Transformer
+cnn_transformer,0.8919,0.9252,0.2726,0.0822,CNN+Transformer

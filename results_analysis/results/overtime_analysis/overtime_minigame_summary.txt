@@ -1,0 +1,46 @@
+================================================================================
+OVERTIME 'MINI-GAME' ANALYSIS SUMMARY
+================================================================================
+
+CONCEPT:
+Each overtime period is a best-of-6 rounds mini-game with:
+• Economy reset to fixed amount (both teams equal)
+• First to 4 rounds wins the OT period
+• If tied 3-3, another OT period begins
+
+KEY FINDINGS:
+
+1. OVERTIME FREQUENCY:
+   • 108 matches went to overtime (6.93% of ESTA matches)
+   • Multiple OT periods occurred in ~20% of overtime matches
+   • Longest match: 71 rounds (7 overtime periods)
+
+2. ECONOMIC PATTERNS:
+   • Starting equipment is consistent due to OT reset
+   • Lower variability than regulation rounds
+   • Teams start on equal economic footing
+
+3. COMPETITIVENESS:
+   • ~60% of OT periods are competitive (close scores)
+   • ~40% are one-sided (4-0, 4-1 scores)
+   • Similar competitiveness across OT period numbers
+
+4. INDEPENDENCE:
+   • OT periods show moderate independence
+   • Winning OT1 gives ~55% chance to win OT2
+   • Some momentum carryover, but mostly independent
+
+================================================================================
+IMPLICATIONS FOR MODELING:
+================================================================================
+• Overtime should be predicted separately from regulation
+• Economic features less important in OT (reset equalizes)
+• Performance metrics (kills, damage) may matter more
+• Mental/stamina factors potentially important in multi-OT
+• Each OT period can be treated as semi-independent event
+
+RECOMMENDATIONS:
+• Build separate model for overtime win prediction
+• De-emphasize economic features in OT model
+• Consider cumulative fatigue for multi-OT scenarios
+• Treat regulation and overtime as distinct prediction tasks

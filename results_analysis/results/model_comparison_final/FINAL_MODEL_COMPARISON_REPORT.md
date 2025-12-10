@@ -1,0 +1,186 @@
+# Model Comparison Report: All 6 Models
+================================================================================
+
+## Executive Summary
+
+This report compares 6 machine learning models for CS:GO match prediction:
+1. **Logistic Regression** - Linear baseline
+2. **Random Forest** - Ensemble method
+3. **k-Nearest Neighbors** - Instance-based learning
+4. **Multi-Layer Perceptron (MLP)** - Basic neural network
+5. **Transformer** - Self-attention sequence model
+6. **CNN + Transformer** - Hybrid temporal model
+
+## Key Findings
+
+### Best Overall Model: **CNN+Transformer**
+- **ROC-AUC**: 0.9252
+- **Accuracy**: 0.8919
+
+## Is CNN+Transformer Worth Using?
+
+### ✓ **YES - HIGHLY RECOMMENDED**
+CNN+Transformer achieves top-tier performance (ROC-AUC: within 0.0000 of best)
+
+**Reasoning:**
+- Average ranking: #1.0 out of 6 models
+- ROC-AUC gap: +0.0000 vs. best model (CNN+Transformer)
+- Accuracy gap: +0.0000
+
+## Model-by-Model Analysis: Advantages and Trade-offs
+
+### Logistic Regression
+
+**Performance**: Accuracy=0.7148, ROC-AUC=0.7853
+**Ranking**: #4.0 overall
+
+**Strengths:**
+- Fastest inference and simplest deployment
+- Highly interpretable - clear feature coefficients
+- No hyperparameter tuning needed
+- Works well as baseline
+
+**Weaknesses:**
+- Linear decision boundary limits performance
+- Cannot capture complex interactions
+- Lower accuracy than neural models
+
+**Best Use Case:**
+- You need interpretability, fast deployment, or a simple baseline
+
+### Random Forest
+
+**Performance**: Accuracy=0.6942, ROC-AUC=0.7600
+**Ranking**: #5.0 overall
+
+**Strengths:**
+- Built-in feature importance scores
+- Handles non-linear relationships well
+- Robust to overfitting
+- No feature scaling required
+
+**Weaknesses:**
+- Larger model size
+- Slower inference than linear models
+- Can struggle with high cardinality features
+
+**Best Use Case:**
+- You need feature importance analysis and robust predictions
+
+### k-Nearest Neighbors
+
+**Performance**: Accuracy=0.6739, ROC-AUC=0.7256
+**Ranking**: #6.0 overall
+
+**Strengths:**
+- Non-parametric - no training phase
+- Adapts to local patterns
+- Simple and intuitive
+
+**Weaknesses:**
+- Very slow inference (computes distances to all points)
+- Sensitive to feature scaling
+- Poor performance on high-dimensional data
+- Typically lowest accuracy
+
+**Best Use Case:**
+- Small dataset with clear local patterns (rarely recommended for production)
+
+### Multi-Layer Perceptron
+
+**Performance**: Accuracy=0.7149, ROC-AUC=0.7897
+**Ranking**: #3.0 overall
+
+**Strengths:**
+- Captures non-linear relationships
+- Faster than sequence models
+- Good balance of performance and complexity
+- Treats each sample independently
+
+**Weaknesses:**
+- No temporal modeling
+- Requires hyperparameter tuning
+- Black box model
+- Can overfit on small datasets
+
+**Best Use Case:**
+- You need neural network power without sequence modeling
+
+### Transformer
+
+**Performance**: Accuracy=0.8901, ROC-AUC=0.9246
+**Ranking**: #2.0 overall
+
+**Strengths:**
+- Models temporal dependencies with self-attention
+- Captures long-range patterns across rounds
+- State-of-the-art architecture
+- Often achieves best accuracy
+
+**Weaknesses:**
+- Slower inference than non-sequential models
+- Requires sequence preparation
+- More complex deployment
+- Needs more training data
+
+**Best Use Case:**
+- Temporal patterns are critical and you have sufficient data
+
+### CNN+Transformer
+
+**Performance**: Accuracy=0.8919, ROC-AUC=0.9252
+**Ranking**: #1.0 overall
+
+**Strengths:**
+- Hierarchical feature extraction (CNN for local, Transformer for global)
+- Captures both short-term and long-term dependencies
+- Potentially best of both worlds
+- Advanced architecture
+
+**Weaknesses:**
+- Most complex model
+- Slowest inference
+- Requires most training time
+- May overfit on small datasets
+- Deployment complexity
+
+**Best Use Case:**
+- Both local patterns and global dependencies matter, and you have computational resources
+
+## Final Recommendations
+
+### For Production Deployment:
+**Recommended: CNN+Transformer**
+- Good accuracy (0.8919)
+- Reliable AUC (0.9252)
+- Reasonable complexity
+
+### For Maximum Accuracy:
+**Recommended: CNN+Transformer**
+- Best ROC-AUC: 0.9252
+- Top accuracy: 0.8919
+
+### For Interpretability:
+**Recommended: Logistic Regression or Random Forest**
+- Logistic: Feature coefficients show impact
+- Random Forest: Feature importance scores
+
+### For Research & Experimentation:
+**Recommended: Transformer or CNN+Transformer**
+- Explore temporal modeling
+- Understand round-by-round dynamics
+- Push state-of-the-art boundaries
+
+## Performance Summary Table
+
+| Model | Accuracy | ROC-AUC | Overall Rank |
+|-------|----------|---------|--------------|
+| Logistic Regression | 0.7148 | 0.7853 | #4.0 |
+| Random Forest | 0.6942 | 0.7600 | #5.0 |
+| k-Nearest Neighbors | 0.6739 | 0.7256 | #6.0 |
+| Multi-Layer Perceptron | 0.7149 | 0.7897 | #3.0 |
+| Transformer | 0.8901 | 0.9246 | #2.0 |
+| CNN+Transformer | 0.8919 | 0.9252 | #1.0 |
+
+---
+*Analysis generated by comprehensive model comparison script*

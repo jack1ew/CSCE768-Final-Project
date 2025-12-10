@@ -1,0 +1,194 @@
+{
+  "logistic_kaggle": {
+    "run": 1,
+    "metrics": {
+      "model": "logistic",
+      "dataset": "kaggle",
+      "run": 1,
+      "timestamp": "2025-11-20T02:31:50.502240",
+      "train_accuracy": 0.6916421427100765,
+      "test_accuracy": 0.6949304704236166,
+      "test_log_loss": 0.5843240782102506,
+      "test_brier_score": 0.19955065691882742,
+      "test_roc_auc": 0.7595195412500316,
+      "generalization_gap": -0.00328832771354004,
+      "train_time_seconds": 0.43551063537597656
+    }
+  },
+  "random_forest_kaggle": {
+    "run": 1,
+    "metrics": {
+      "model": "random_forest",
+      "dataset": "kaggle",
+      "run": 1,
+      "timestamp": "2025-11-20T02:32:37.449821",
+      "train_accuracy": 0.7352953014627682,
+      "test_accuracy": 0.6799255792067561,
+      "test_log_loss": 0.6101716005771816,
+      "test_brier_score": 0.20828512865442228,
+      "test_roc_auc": 0.7402048912536914,
+      "generalization_gap": 0.05536972225601211,
+      "train_time_seconds": 15.508967161178589
+    }
+  },
+  "knn_kaggle": {
+    "run": 1,
+    "metrics": {
+      "model": "knn",
+      "dataset": "kaggle",
+      "run": 1,
+      "timestamp": "2025-11-20T03:25:11.646967",
+      "train_accuracy": 0.7104805663447203,
+      "test_accuracy": 0.6506804363708409,
+      "test_log_loss": 2.254739138229461,
+      "test_brier_score": 0.23670728234084976,
+      "test_roc_auc": 0.6961030069210483,
+      "generalization_gap": 0.0598001299738794,
+      "train_time_seconds": 0.211669921875
+    }
+  },
+  "mlp_kaggle": {
+    "run": 1,
+    "metrics": {
+      "model": "mlp",
+      "dataset": "kaggle",
+      "run": 1,
+      "timestamp": "2025-11-20T10:46:59.073496",
+      "train_accuracy": 0.6921104328858905,
+      "test_accuracy": 0.6950171502160803,
+      "test_log_loss": 0.5804991817071037,
+      "test_brier_score": 0.1980857632144727,
+      "test_roc_auc": 0.7629449788177236,
+      "generalization_gap": -0.0029067173301898785,
+      "train_time_seconds": 65.79344177246094
+    }
+  },
+  "logistic_esta": {
+    "run": 4,
+    "metrics": {
+      "model": "logistic",
+      "dataset": "esta",
+      "run": 4,
+      "timestamp": "2025-11-20T10:51:07.885152",
+      "train_accuracy": 0.7395338733202992,
+      "test_accuracy": 0.7796865203761756,
+      "test_log_loss": 0.46655798530929643,
+      "test_brier_score": 0.15216041916487308,
+      "test_roc_auc": 0.8629126364717328,
+      "generalization_gap": -0.0401526470558764,
+      "train_time_seconds": 0.19418787956237793
+    }
+  },
+  "random_forest_esta": {
+    "run": 4,
+    "metrics": {
+      "model": "random_forest",
+      "dataset": "esta",
+      "run": 4,
+      "timestamp": "2025-11-20T10:51:29.426666",
+      "train_accuracy": 0.9746299227260031,
+      "test_accuracy": 0.7689028213166145,
+      "test_log_loss": 0.4876137978874082,
+      "test_brier_score": 0.15745623648243184,
+      "test_roc_auc": 0.8532206955513408,
+      "generalization_gap": 0.20572710140938866,
+      "train_time_seconds": 4.182074069976807
+    }
+  },
+  "knn_esta": {
+    "run": 4,
+    "metrics": {
+      "model": "knn",
+      "dataset": "esta",
+      "run": 4,
+      "timestamp": "2025-11-20T10:52:22.876966",
+      "train_accuracy": 0.7973342022778761,
+      "test_accuracy": 0.7253918495297805,
+      "test_log_loss": 1.678344279989588,
+      "test_brier_score": 0.18872476489028214,
+      "test_roc_auc": 0.7939684633602264,
+      "generalization_gap": 0.07194235274809557,
+      "train_time_seconds": 0.02542901039123535
+    }
+  },
+  "mlp_esta": {
+    "run": 4,
+    "metrics": {
+      "model": "mlp",
+      "dataset": "esta",
+      "run": 4,
+      "timestamp": "2025-11-20T10:52:52.643080",
+      "train_accuracy": 0.7434906743630326,
+      "test_accuracy": 0.7752978056426332,
+      "test_log_loss": 0.4641721855055255,
+      "test_brier_score": 0.15266472806579248,
+      "test_roc_auc": 0.8609417596132114,
+      "generalization_gap": -0.03180713127960055,
+      "train_time_seconds": 3.3427350521087646
+    }
+  },
+  "logistic_combined": {
+    "run": 5,
+    "metrics": {
+      "model": "logistic",
+      "dataset": "combined",
+      "run": 5,
+      "timestamp": "2025-11-20T10:53:33.266365",
+      "train_accuracy": 0.6944414130361045,
+      "test_accuracy": 0.6962669449800405,
+      "test_log_loss": 0.5808010262858659,
+      "test_brier_score": 0.1982430687519773,
+      "test_roc_auc": 0.7625817385494138,
+      "generalization_gap": -0.0018255319439359763,
+      "train_time_seconds": 1.8364808559417725
+    }
+  },
+  "random_forest_combined": {
+    "run": 5,
+    "metrics": {
+      "model": "random_forest",
+      "dataset": "combined",
+      "run": 5,
+      "timestamp": "2025-11-20T11:01:13.064632",
+      "train_accuracy": 0.7272801680022888,
+      "test_accuracy": 0.6924548772649814,
+      "test_log_loss": 0.5868832192093517,
+      "test_brier_score": 0.20029450657430145,
+      "test_roc_auc": 0.7578484203312269,
+      "generalization_gap": 0.034825290737307335,
+      "train_time_seconds": 61.04173493385315
+    }
+  },
+  "knn_combined": {
+    "run": 5,
+    "metrics": {
+      "model": "knn",
+      "dataset": "combined",
+      "run": 5,
+      "timestamp": "2025-11-20T13:53:16.616104",
+      "train_accuracy": 0.7147013800609362,
+      "test_accuracy": 0.6524090027300655,
+      "test_log_loss": 2.2914183772735712,
+      "test_brier_score": 0.23600974096808244,
+      "test_roc_auc": 0.6983128790613984,
+      "generalization_gap": 0.062292377330870674,
+      "train_time_seconds": 0.24009084701538086
+    }
+  },
+  "mlp_combined": {
+    "run": 5,
+    "metrics": {
+      "model": "mlp",
+      "dataset": "combined",
+      "run": 5,
+      "timestamp": "2025-11-20T13:57:34.268535",
+      "train_accuracy": 0.6947289871786174,
+      "test_accuracy": 0.696529337885408,
+      "test_log_loss": 0.5774254542751781,
+      "test_brier_score": 0.19704278697775943,
+      "test_roc_auc": 0.7655082868530281,
+      "generalization_gap": -0.0018003507067906321,
+      "train_time_seconds": 29.303772926330566
+    }
+  }
+}

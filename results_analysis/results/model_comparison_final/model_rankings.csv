@@ -1,0 +1,7 @@
+model,Accuracy,ROC-AUC,Log Loss,Brier Score,Average Rank
+CNN+Transformer,1,1,1,1,1.0
+Transformer,2,2,2,2,2.0
+Multi-Layer Perceptron,3,3,3,3,3.0
+Logistic Regression,4,4,4,4,4.0
+Random Forest,5,5,5,5,5.0
+k-Nearest Neighbors,6,6,6,6,6.0

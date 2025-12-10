@@ -1,0 +1,53 @@
+# Large datasets - exclude from git
+data_processing/
+data/
+
+# Trained model files (large)
+models_code/
+models/saved_models/
+*.pt
+*.pth
+*.joblib
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Keep results and figures
+!results_analysis/
+
+# Claude/Gemini artifacts (personal)
+.claude/
+.gemini/

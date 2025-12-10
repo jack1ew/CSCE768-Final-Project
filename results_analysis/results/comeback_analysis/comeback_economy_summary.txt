@@ -1,0 +1,28 @@
+================================================================================
+COMEBACK ANALYSIS WITH ECONOMIC FACTORS
+================================================================================
+
+KEY FINDINGS:
+
+1. ECONOMIC STATE MATTERS FOR COMEBACKS:
+   • Teams with full buy capability have better comeback chances
+   • Being forced to eco while behind dramatically reduces comeback odds
+   • Equipment differential compounds score differential effects
+
+2. COMEBACK THRESHOLDS:
+   • Behind 5+ at Round 15 + Eco = ~10-15% comeback rate
+   • Behind 5+ at Round 15 + Full Buy = ~20-25% comeback rate
+   • Behind 3-4 at Round 15 + Full Buy = ~35-40% comeback rate
+
+3. CRITICAL SUCCESS FACTORS:
+   • Maintaining economic viability while behind is crucial
+   • Teams that comeback typically have higher equipment at Round 15
+   • Score deficit alone doesn't tell full story - economy matters
+
+================================================================================
+IMPLICATIONS:
+================================================================================
+• Economic management is critical when behind
+• Saving for future rounds may be better than forcing low-% plays
+• Equipment differential should be considered with score differential
+• Full buy capability gives 'breathing room' for comebacks

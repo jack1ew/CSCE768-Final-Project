@@ -1,0 +1,34 @@
+# CSCE768 Final Project - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# CS:GO demo parsing
+awpy>=1.4.0
+
+# Machine Learning - Traditional Models
+scikit-learn>=1.3.0
+
+# Deep Learning
+torch>=2.0.0
+transformers>=4.30.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Progress bars
+tqdm>=4.65.0
+
+# Jupyter notebooks
+jupyter>=1.0.0
+ipykernel>=6.23.0
+
+# Model tracking (optional)
+# mlflow>=2.5.0
+# wandb>=0.15.0
+
+# Testing (optional)
+# pytest>=7.4.0

@@ -1,0 +1,68 @@
+================================================================================
+REGULATION/OVERTIME DATA SEPARATION SUMMARY
+================================================================================
+
+
+ESTA Dataset:
+------------------------------------------------------------
+ORIGINAL DATA:
+  Total Rows:    82,152
+  Total Matches: 1,558
+
+REGULATION DATA (rounds 1-30):
+  Rows:          80,396 (97.86%)
+  Matches:       1,558
+
+OVERTIME DATA (rounds >30):
+  Rows:          1,756 (2.14%)
+  Matches:       108
+
+KAGGLE Dataset:
+------------------------------------------------------------
+ORIGINAL DATA:
+  Total Rows:    1,614,962
+  Total Matches: 31,710
+
+REGULATION DATA (rounds 1-30):
+  Rows:          1,614,962 (100.00%)
+  Matches:       31,710
+
+OVERTIME DATA: None (all matches ended in regulation)
+
+COMBINED Dataset:
+------------------------------------------------------------
+ORIGINAL DATA:
+  Total Rows:    1,697,114
+  Total Matches: 33,268
+
+REGULATION DATA (rounds 1-30):
+  Rows:          1,695,358 (99.90%)
+  Matches:       33,268
+
+OVERTIME DATA (rounds >30):
+  Rows:          1,756 (0.10%)
+  Matches:       108
+
+================================================================================
+FILES CREATED:
+================================================================================
+
+ESTA:
+  • team_round_features_esta_regulation.csv
+  • team_round_features_esta_overtime.csv
+
+KAGGLE:
+  • team_round_features_kaggle_regulation.csv
+
+COMBINED:
+  • team_round_features_combined_regulation.csv
+  • team_round_features_combined_overtime.csv
+
+================================================================================
+NEXT STEPS:
+================================================================================
+
+1. Retrain all models using *_regulation.csv files
+2. Models will now train only on rounds 1-30
+3. Overtime rounds can be analyzed separately as 'mini-games'
+4. Add 3-class prediction (Win/Loss/Overtime) at round 30
