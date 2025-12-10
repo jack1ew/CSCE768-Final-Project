@@ -1,5 +1,5 @@
 \documentclass[10pt,twocolumn]{article}
-\usepackage[margin=0.75in]{geometry}
+\usepackage[margin=0.75in, letterpaper, portrait]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{booktabs}
@@ -11,8 +11,8 @@
 \title{CS:GO Win Probability Prediction: Round-by-Round Analysis with Sequential Models}
 
 \author{
-    Jackie Wang \\
-    \texttt{jackiew@email.sc.edu} \\
+    Jackie Wang \quad Devon Goshorn \\
+    \texttt{jackiew@email.sc.edu} \quad \texttt{goshorna@email.sc.edu} \\[0.5em]
     CSCE 768 - Neural Networks and Deep Learning \\
     University of South Carolina \\
     Professor Jianjun Hu
@@ -235,7 +235,7 @@ Figure~\ref{fig:round_evolution} illustrates how prediction accuracy evolves fro
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.48\textwidth]{results_analysis/results/round_by_round/round_by_round_accuracy_evolution.png}
+\includegraphics[width=0.48\textwidth]{results_analysis/results/round_by_round/round_by_round_accuracy_kaggle.png}
 \caption{Accuracy evolution across rounds (Kaggle dataset). All models show steady improvement concentrated in first 15 rounds.}
 \label{fig:round_evolution}
 \end{figure}
