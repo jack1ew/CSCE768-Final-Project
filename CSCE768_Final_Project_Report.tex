@@ -68,7 +68,7 @@ This work makes three primary contributions:
 Win probability models have a long history in sports analytics. Lock and Nettleton~\cite{lock2014} developed in-game probability models for basketball using logistic regression, demonstrating that estimates improve as games progress. However, traditional approaches assume independent possessions and minimal carryover effects. CS:GO violates these assumptions due to its economic momentum system.
 
 \subsection{Esports Prediction}
-Recent work has addressed esports prediction challenges. Yang et al.~\cite{yang2016} predicted League of Legends outcomes using early-game statistics, achieving 74\% accuracy with Random Forests. Hodge et al.~\cite{hodge2019} developed win probability graphs for Dota 2. However, these studies focus on match-level prediction rather than round-by-round evolution.
+Recent work has addressed esports prediction challenges. Junior and Campelo~\cite{moreira2023} predicted League of Legends outcomes using real-time match statistics, achieving 81.6\% accuracy with LightGBM in mid-game prediction. Hodge et al.~\cite{hodge2019} developed win probability graphs for Dota 2. However, these studies focus on match-level prediction rather than round-by-round evolution.
 
 For CS:GO specifically, Silva et al.~\cite{silva2017} predicted match winners using team statistics, while Agarwala and Pearce~\cite{agarwala2014} analyzed optimal buying strategies. Our work differs by focusing on within-match dynamics and quantifying how prediction confidence evolves.
 
@@ -439,10 +439,10 @@ D.~Lock and D.~Nettleton.
 \newblock Using random forests to estimate win probability before each play of an nfl game.
 \newblock {\em Journal of Quantitative Analysis in Sports}, 10(2):197--205, 2014.
 
-\bibitem{yang2016}
-P.~Yang, B.~E. Harrison, and D.~L. Roberts.
-\newblock Predicting match outcomes in league of legends.
-\newblock In {\em Twelfth Artificial Intelligence and Interactive Digital Entertainment Conference}, 2016.
+\bibitem{moreira2023}
+J.~B.~S. Junior and C.~E.~C. Campelo.
+\newblock League of legends: Real-time result prediction.
+\newblock arXiv:2309.02449, 2023.
 
 \bibitem{hodge2019}
 V.~J. Hodge et al.
